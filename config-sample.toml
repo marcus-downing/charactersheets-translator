@@ -1,0 +1,17 @@
+debug = 1
+
+[server]
+
+hostname = "localhost"
+port = 9091
+
+[pdf]
+
+path = ""
+
+[db]
+
+host = "localhost"
+db = ""
+user = ""
+password = ""
