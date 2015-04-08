@@ -417,7 +417,7 @@ func renderTemplate(name string, w http.ResponseWriter, r *http.Request, datapro
 	}
 	fmt.Println("Rendering page:", name)
 
-	t, err := template.New("_base.html").Funcs(templateFuncs).ParseFiles("../view/_base.html", "../view/"+name+".html")
+	t, err := template.New("_base.html").Funcs(templateFuncs).ParseFiles("view/_base.html", "view/"+name+".html")
 	if err != nil {
 		fmt.Fprint(w, "Error:", err)
 		fmt.Println("Error:", err)

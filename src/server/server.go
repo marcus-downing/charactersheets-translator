@@ -1,6 +1,7 @@
 package server
 
 import (
+	"../config"
 	"../model"
 	"fmt"
 	// "io/ioutil"
@@ -45,12 +46,12 @@ func RunTranslator(host string, debug int) {
 	handler.HandleFunc("/api/translate", control.APITranslateHandler)
 	handler.HandleFunc("/api/vote", control.APIVoteHandler)
 
-	handler.Handle("/css/", http.FileServer(http.Dir("../web")))
-	handler.Handle("/bootstrap/", http.FileServer(http.Dir("../web")))
-	handler.Handle("/images/", http.FileServer(http.Dir("../web")))
-	handler.Handle("/js/", http.FileServer(http.Dir("../web")))
+	handler.Handle("/css/", http.FileServer(http.Dir("web")))
+	handler.Handle("/bootstrap/", http.FileServer(http.Dir("web")))
+	handler.Handle("/images/", http.FileServer(http.Dir("web")))
+	handler.Handle("/js/", http.FileServer(http.Dir("web")))
 
-	handler.Handle("/pdf/", http.FileServer(http.Dir("../../Composer 2.1.3/public")))
+	handler.Handle("/pdf/", http.FileServer(http.Dir(config.Config.PDF.Path)))
 
 	handler.HandleFunc("/", defaultHandler)
 
@@ -105,7 +106,7 @@ func (h *AuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.URL.Path {
 	case "/login":
 		if r.Method != "POST" {
-			http.ServeFile(w, r, "../view/login.html")
+			http.ServeFile(w, r, "view/login.html")
 			return
 		}
 		err := r.ParseForm()
@@ -141,19 +142,19 @@ func (h *AuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 
 	case "/account/reclaim/sent":
-		http.ServeFile(w, r, "../view/account_reclaim_sent.html")
+		http.ServeFile(w, r, "view/account_reclaim_sent.html")
 		return
 
 	case "/account/reclaim/done":
-		http.ServeFile(w, r, "../view/account_reclaim_done.html")
+		http.ServeFile(w, r, "view/account_reclaim_done.html")
 		return
 
 	case "/account/reclaim/incorrect":
-		http.ServeFile(w, r, "../view/account_reclaim_incorrect.html")
+		http.ServeFile(w, r, "view/account_reclaim_incorrect.html")
 		return
 
 	case "/account/reclaim/nouser":
-		http.ServeFile(w, r, "../view/account_reclaim_nouser.html")
+		http.ServeFile(w, r, "view/account_reclaim_nouser.html")
 		return
 
 	case "/account/reclaim":
@@ -207,7 +208,7 @@ func (h *AuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		} else if r.Method == "GET" {
 			if secret == "" {
-				http.ServeFile(w, r, "../view/account_reclaim.html")
+				http.ServeFile(w, r, "view/account_reclaim.html")
 				return
 			}
 
@@ -225,9 +226,8 @@ func (h *AuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					Email:  email,
 					Secret: secret,
 				}
-				t, _ := template.ParseFiles("../view/account_reclaim_set_password.html")
+				t, _ := template.ParseFiles("view/account_reclaim_set_password.html")
 				t.Execute(w, data)
-				// http.ServeFile(w, r, "../view/account_reclaim_set_password.html")
 				return
 			} else {
 				fmt.Println("Account reclaim: Incorrect:", err)

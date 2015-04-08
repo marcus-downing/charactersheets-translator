@@ -1,7 +1,10 @@
 package main
 
-import "./server"
+import (
+	"./config"
+	"./server"
+)
 
 func main() {
-	server.RunTranslator("translate.charactersheets.minotaur.cc", 0)
+	server.RunTranslator(config.Config.Server.Host(), config.Config.Debug)
 }
