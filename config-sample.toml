@@ -15,3 +15,10 @@ host = "localhost"
 db = ""
 user = ""
 password = ""
+
+[old_db]
+
+host = "localhost"
+db = ""
+user = ""
+password = ""

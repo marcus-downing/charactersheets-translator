@@ -1,0 +1,34 @@
+{{ define "title" }}Masquerading As User{{ end }}
+
+{{ define "content" }}
+
+<div class='container'>
+<h1><span class="glyphicon glyphicon-remove"></span> <span class="glyphicon glyphicon-user"></span>&nbsp; Masquerading As User</h1>
+
+<form method='post' action='/users/del' class='' role='form'>
+  <input type='hidden' name='user' value='{{ .CurrentUser.Email }}'>
+  <input type='hidden' name='go' value='yes'>
+
+  <p>You are now masquerading as this user:</p>
+
+  <div class='form-group'>
+    <label for='add-user-email'>Email address</label>
+    <p>{{ .CurrentUser.Email }}</p>
+  </div>
+
+  <div class='form-group'>
+    <label for='add-user-name'>Name</label>
+    <p>{{ .CurrentUser.Name }}</p>
+  </div>
+
+  <p>
+    <label>Language</label> &nbsp; 
+    {{ $languageNames := .LanguageNames }}
+    {{ $lang := .CurrentUser.Language }}
+    <p><img src='/images/flags/{{ $lang }}.png'> &nbsp; {{ index $languageNames $lang }}</p>
+  </p>
+
+</form>
+
+</div>{{/* container */}}
+{{ end }}

@@ -4,6 +4,7 @@ import (
 	"../model"
 	"code.google.com/p/go.crypto/bcrypt"
 	"fmt"
+	// "github.com/bpowers/seshcookie"
 	"net/http"
 )
 
@@ -41,6 +42,13 @@ func UsersHandler(w http.ResponseWriter, r *http.Request) {
 
 func UsersAddHandler(w http.ResponseWriter, r *http.Request) {
 	renderTemplate("users_add", w, r, nil)
+}
+
+func UsersMasqueradeHandler(w http.ResponseWriter, r *http.Request) {
+	renderTemplate("users_masq", w, r, func(data TemplateData) TemplateData {
+		// data.User = user
+		return data
+	})
 }
 
 func UsersDelHandler(w http.ResponseWriter, r *http.Request) {

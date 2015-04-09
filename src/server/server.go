@@ -36,6 +36,7 @@ func RunTranslator(host string, debug int) {
 	handler.HandleFunc("/users", control.UsersHandler)
 	handler.HandleFunc("/users/add", control.UsersAddHandler)
 	handler.HandleFunc("/users/del", control.UsersDelHandler)
+	handler.HandleFunc("/users/masq", control.UsersMasqueradeHandler)
 	handler.HandleFunc("/account", control.AccountHandler)
 	handler.HandleFunc("/account/password", control.SetPasswordHandler)
 	handler.HandleFunc("/account/reclaim", control.AccountReclaimHandler)
@@ -104,6 +105,22 @@ func (h *AuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	switch r.URL.Path {
+	case "/users/masq":
+		currentUser := control.GetCurrentUser(r)
+		if currentUser != nil && currentUser.IsAdmin {
+			email := r.FormValue("user")
+			user := model.GetUserByEmail(email)
+			if user != nil {
+				// actually become that user
+				fmt.Println("Masquerading as user:", user.Email)
+				session["user"] = user.Email
+				session["masquerade"] = currentUser.Email
+				fmt.Printf("altered session: %#v\n", session)
+				http.Redirect(w, r, "/home", http.StatusFound)
+				return
+			}
+		}
+
 	case "/login":
 		if r.Method != "POST" {
 			http.ServeFile(w, r, "view/login.html")

@@ -45,6 +45,7 @@
 		</td>
 		{{ if $isAdmin }}<td>
 			{{ if not $user.IsAdmin }}
+			<a class='btn btn-info' href='/users/masq?user={{ $user.Email }}'>Masquerade</a> &nbsp; 
 			<a class='btn btn-danger' href='/users/del?user={{ $user.Email }}'>Delete</a>
 			{{ end }}
 		</td>{{ end }}

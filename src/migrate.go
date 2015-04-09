@@ -1,23 +1,28 @@
 package main
 
 import (
+	"./config"
 	"./model"
-	"database/sql"
+	// "database/sql"
 	"fmt"
 	_ "github.com/ziutek/mymysql/godrv"
 )
 
 func main() {
-	dbname1 := "chartrans"
-	dbname2 := "chartrans2"
-	dbuser := "chartrans"
-	dbpassword := "fiddlesticks"
+	dbname1 := config.Config.OldDatabase.Database
+	// dbname2 := config.Config.Database.Database
+	// dbname1 := "chartrans"
+	// dbname2 := "chartrans2"
+	// dbuser := "chartrans"
+	// dbpassword := "fiddlesticks"
 
-	db1, err := sql.Open("mymysql", dbname1+"/"+dbuser+"/"+dbpassword)
+	// db1, err := sql.Open("mymysql", dbname1+"/"+dbuser+"/"+dbpassword)
+	db1, err := config.Config.OldDatabase.Open()
 	if err != nil {
 		fmt.Println("Error opening database 1:", err)
 	}
-	db2, err := sql.Open("mymysql", dbname2+"/"+dbuser+"/"+dbpassword)
+	// db2, err := sql.Open("mymysql", dbname2+"/"+dbuser+"/"+dbpassword)
+	db2, err := config.Config.Database.Open()
 	if err != nil {
 		fmt.Println("Error opening database 2:", err)
 	}

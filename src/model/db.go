@@ -1,24 +1,26 @@
 package model
 
 import (
+	"../config"
 	"database/sql"
 	"fmt"
 	"strings"
-	// _ "github.com/ziutek/mymysql/mysql"
-	_ "github.com/ziutek/mymysql/godrv"
-)
-
-const (
-	dbname     = "chartrans2"
-	dbuser     = "chartrans"
-	dbpassword = "fiddlesticks"
 )
 
 var Debug = 0
 
 //  users
 
-var db, err = sql.Open("mymysql", dbname+"/"+dbuser+"/"+dbpassword)
+var db *sql.DB
+
+func init() {
+	var err error
+	db, err = config.Config.Database.Open()
+
+	if err != nil {
+		fmt.Println("Error connecting to database:", err)
+	}
+}
 
 func WithDB(f func(tx *sql.Tx)) {
 	// connect to database

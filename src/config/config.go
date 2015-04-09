@@ -5,7 +5,10 @@ import (
 	toml "github.com/BurntSushi/toml"
 	"io/ioutil"
 	// "os"
+	"database/sql"
 	"strconv"
+	// _ "github.com/ziutek/mymysql/mysql"
+	_ "github.com/ziutek/mymysql/godrv"
 )
 
 var Config Configuration
@@ -13,24 +16,28 @@ var Config Configuration
 // the types
 
 type Configuration struct {
-	Debug    int `toml:"debug"`
-	Fail     bool
-	Server   ServerConfig
-	PDF      PDFConfig
-	Database DatabaseConfig
+	Debug       int `toml:"debug"`
+	Fail        bool
+	Server      serverConfig   `toml:"server"`
+	PDF         pdfConfig      `toml:"pdf"`
+	Database    databaseConfig `toml:"db"`
+	OldDatabase databaseConfig `toml:"old_db"`
 }
 
-type ServerConfig struct {
+type serverConfig struct {
 	Hostname string `toml:"hostname"`
 	Port     int    `toml:"port"`
 }
 
-type PDFConfig struct {
+type pdfConfig struct {
 	Path string `toml:"path"`
 }
 
-type DatabaseConfig struct {
-	Hostname string `toml:"hostname"`
+type databaseConfig struct {
+	Hostname string `toml:"host"`
+	Database string `toml:"db"`
+	Username string `toml:"user"`
+	Password string `toml:"password"`
 }
 
 // loading the config
@@ -41,10 +48,10 @@ func init() {
 
 func LoadConfig(initial bool) {
 	config := Configuration{
-		Debug: 1,
+		Debug: 0,
 		Fail:  false,
-		Server: ServerConfig{
-			Hostname: "localhost",
+		Server: serverConfig{
+			Hostname: "",
 			Port:     9091,
 		},
 	}
@@ -65,17 +72,31 @@ func LoadConfig(initial bool) {
 		return
 	}
 
+	config.Fail = false
+
+	// if that worked, swap the config for the new one
+	Config = config
 	if Config.Debug > 0 {
 		DebugConfig()
 	}
-	// if that worked, swap the config for the new one
-	Config = config
 }
 
 func DebugConfig() {
 	fmt.Printf("Config: %#v\n", Config)
 }
 
-func (server ServerConfig) Host() string {
+func (server *serverConfig) Host() string {
 	return server.Hostname + ":" + strconv.Itoa(server.Port)
+}
+
+func (db *databaseConfig) Open() (*sql.DB, error) {
+	conn := db.Database + "/" + db.Username + "/" + db.Password
+	if db.Hostname != "localhost" && db.Hostname != "" {
+		conn = "tcp:" + db.Hostname + "*" + conn
+	}
+	if Config.Debug > 0 {
+		fmt.Println("Connecting to", conn)
+	}
+	sqldb, err := sql.Open("mymysql", conn)
+	return sqldb, err
 }
