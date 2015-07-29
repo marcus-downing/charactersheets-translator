@@ -177,4 +177,8 @@ func main() {
 		}
 		fmt.Println(n_votes)
 	}
+
+	// conflicts
+	fmt.Print("Finding conflicts...")
+	model.MarkAllConflicts()
 }

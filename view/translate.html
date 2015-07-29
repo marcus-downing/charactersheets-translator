@@ -97,9 +97,9 @@
 {{ $lang := .CurrentLanguage }}
 {{ range $i, $entry := .Entries }}
 <tr class='entry {{ entryClass $entry $lang $currentUser }}' data-line='{{ $i }}'>
-	<td class='btn-cell'><a class='btn btn-default reveal reveal-sources' data-line='{{ $i }}' data-toggle='modal' data-target='#entry-modal-{{ $i }}'>
+	<td class='btn-cell'><a class='reveal reveal-sources' data-line='{{ $i }}' data-toggle='modal' data-target='#entry-modal-{{ $i }}' style='cursor: pointer;'>
 		<span class='glyphicon glyphicon-book'></span>&nbsp; <b>{{ len $entry.EntrySources }}</b>
-		&nbsp; <span class='label label-primary'>{{ $entry.Count }}</span>
+		<br/><span class='label label-primary'>{{ $entry.Count }}</span>
 		</a></td>
 	<td class='original'>
 		{{ range $j, $part := $entry.Entries }}
@@ -118,7 +118,11 @@
 		<table>
 			{{ range $translation := $otherTranslations }}
 				<tr class='other-translation'>
-					<td class='btn-cell'>{{ if $translation.IsPreferred }}<span class='glyphicon glyphicon-ok'></span>{{ end }}</td>
+					<td class='btn-cell'>
+						{{ if $translation.IsPreferred }}<span class='glyphicon glyphicon-circle-arrow-right green-icon'></span>{{ end }}
+						{{ if and (not $translation.IsPreferred) (not $translation.IsConflicted) }}<span class='glyphicon glyphicon-ban grey-icon'></span>{{ end }}
+						{{ if $translation.IsConflicted }}<span class='glyphicon glyphicon-exclamation-sign red-icon'></span>{{ end }}
+					</td>
 					<td class='btn-cell'><img src='http://www.gravatar.com/avatar/{{ md5 $translation.Translator }}?s=24'></td>
 					<td class='translation-parts'>
 						{{ range $part := $translation.Parts }}
@@ -136,7 +140,11 @@
 			{{ end }}
 
 			<tr class='my-translation'>
-				<td class='btn-cell'>{{ if $myTranslation.IsPreferred }}<span class='glyphicon glyphicon-ok'></span>{{ end }}</td>
+				<td class='btn-cell'>
+					{{ if $myTranslation.IsPreferred }}<span class='glyphicon glyphicon-circle-arrow-right green-icon'></span>{{ end }}
+					{{ if and (not $myTranslation.IsPreferred) (not $myTranslation.IsConflicted) }}<span class='glyphicon glyphicon-ban grey-icon'></span>{{ end }}
+					{{ if $myTranslation.IsConflicted }}<span class='glyphicon glyphicon-exclamation-sign red-icon'></span>{{ end }}
+				</td>
 				<td class='btn-cell'><img src='http://www.gravatar.com/avatar/{{ md5 $currentUser.Email }}?s=24'></td>
 				<td class='translation-parts'>
 					<span class='my-translation-arrow-score'></span><span class='my-translation-arrow'></span>

@@ -199,6 +199,7 @@ type TranslationSet struct {
 	Language     string
 	Count        int
 	IsVotable    bool
+	IsConflicted bool
 	Untranslated bool
 }
 
@@ -207,6 +208,7 @@ func getTranslationSet(entry *model.StackedEntry, language string, me *model.Use
 
 	others := make([]*model.StackedTranslation, 0, len(translations))
 	var mine *model.StackedTranslation = nil
+	var isConflicted bool = false
 
 	for _, translation := range translations {
 		if translation != nil {
@@ -214,6 +216,9 @@ func getTranslationSet(entry *model.StackedEntry, language string, me *model.Use
 				mine = translation
 			} else {
 				others = append(others, translation)
+			}
+			if translation.IsConflicted {
+				isConflicted = true
 			}
 		}
 	}
@@ -229,6 +234,7 @@ func getTranslationSet(entry *model.StackedEntry, language string, me *model.Use
 		Language:     language,
 		Count:        count,
 		IsVotable:    count > 1,
+		IsConflicted: isConflicted,
 		Untranslated: mine == nil,
 	}
 }
@@ -258,6 +264,10 @@ func myTranslation(set *TranslationSet) *model.StackedTranslation {
 }
 
 func otherTranslations(set *TranslationSet) []*model.StackedTranslation {
+	fmt.Println("Return other translations:-")
+	for _, t := range set.Others {
+		fmt.Println(t)
+	}
 	return set.Others
 }
 
@@ -371,7 +381,7 @@ func sourceCompletion(source *model.Source) map[string]int {
 func isVotedUp(translation *model.StackedTranslation, voter *model.User) bool {
 	votes := translation.GetVotes()
 	for _, vote := range votes {
-		fmt.Println("Vote by", vote.Voter.Email, "=", vote.Vote)
+		// fmt.Println("Vote by", vote.Voter.Email, "=", vote.Vote)
 		if vote.Voter.Email == voter.Email {
 			return vote.Vote
 		}
@@ -382,12 +392,23 @@ func isVotedUp(translation *model.StackedTranslation, voter *model.User) bool {
 func isVotedDown(translation *model.StackedTranslation, voter *model.User) bool {
 	votes := translation.GetVotes()
 	for _, vote := range votes {
-		fmt.Println("Vote by", vote.Voter.Email, "=", vote.Vote)
+		// fmt.Println("Vote by", vote.Voter.Email, "=", vote.Vote)
 		if vote.Voter.Email == voter.Email {
 			return !vote.Vote
 		}
 	}
 	return false
+}
+
+func isConflicted(language string, entry *model.StackedEntry) bool {
+	translations := entry.GetTranslations(language)
+	isConflicted := false
+	for _, translation := range translations {
+		if translation.IsConflicted {
+			isConflicted = true
+		}
+	}
+	return isConflicted
 }
 
 var templateFuncs = template.FuncMap{
@@ -408,6 +429,7 @@ var templateFuncs = template.FuncMap{
 	"previewExists":          previewExists,
 	"isVotedUp":              isVotedUp,
 	"isVotedDown":            isVotedDown,
+	"isConflicted":           isConflicted,
 }
 
 func renderTemplate(name string, w http.ResponseWriter, r *http.Request, dataproc func(data TemplateData) TemplateData) {

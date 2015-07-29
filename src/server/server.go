@@ -88,6 +88,9 @@ type ReclaimFormData struct {
 }
 
 func (h *AuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if model.Debug >= 1 {
+		fmt.Println(" --", model.QueryCount, "database queries so far")
+	}
 	session := seshcookie.Session.Get(r)
 	fmt.Println("\n\nProcessing", r.Method, r.URL.Path)
 	fmt.Printf("using session: %#v\n", session)

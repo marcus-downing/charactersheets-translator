@@ -46,6 +46,10 @@ func APITranslateHandler(w http.ResponseWriter, r *http.Request) {
 	t := &model.Translation{entry, language, translation, user.Email, false, false}
 	t.Save()
 
+	// recalculate conflicts
+	stack := entry.GetStackedEntry()
+	stack.MarkConflicts(language)
+
 	fmt.Fprint(w, "OK")
 }
 
@@ -93,6 +97,10 @@ func APIVoteHandler(w http.ResponseWriter, r *http.Request) {
 		v := &model.Vote{*t, user, up}
 		v.Save()
 	}
+
+	// recalculate conflicts
+	stack := t.Entry.GetStackedEntry()
+	stack.MarkConflicts(language)
 
 	fmt.Fprintf(w, "OK")
 }

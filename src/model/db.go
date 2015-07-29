@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"strings"
+	"runtime/debug"
 )
 
 var Debug = 0
@@ -12,6 +13,7 @@ var Debug = 0
 //  users
 
 var db *sql.DB
+var QueryCount = 0
 
 func init() {
 	var err error
@@ -38,8 +40,15 @@ type Query struct {
 	sql  string
 	args []interface{}
 }
+var lastQuery Query
 
 type Result interface {
+}
+
+func dberr(err error, context string) {
+	fmt.Println("[db] Error in query:", lastQuery.sql)
+	fmt.Println("[db] Error in "+context+"():", err)
+	debug.PrintStack()
 }
 
 func query(query string, args ...interface{}) Query {
@@ -54,9 +63,11 @@ func (query Query) exists() bool {
 		fmt.Println("Exists:", query.sql, query.args)
 	}
 	exists := false
+	lastQuery = query
+	QueryCount++
 	rows, err := db.Query(query.sql, query.args...)
 	if err != nil {
-		fmt.Println("Exists: error:", err)
+		dberr(err, "exists")
 		return false
 	}
 	exists = rows.Next()
@@ -68,10 +79,12 @@ func (query Query) count() int {
 	if Debug >= 2 {
 		fmt.Println("Count:", query.sql, query.args)
 	}
+	lastQuery = query
+	QueryCount++
 	rows, err := db.Query(query.sql, query.args...)
 	defer rows.Close()
 	if err != nil {
-		fmt.Println("Count: error:", err)
+		dberr(err, "count")
 		return 0
 	}
 	if rows.Next() {
@@ -86,9 +99,11 @@ func (query Query) exec() bool {
 	if Debug >= 2 {
 		fmt.Println("Exec:", query.sql, query.args)
 	}
+	lastQuery = query
+	QueryCount++
 	_, err := db.Exec(query.sql, query.args...)
 	if err != nil {
-		fmt.Println("Error executing:", err)
+		dberr(err, "exec")
 		return false
 	}
 	return true
@@ -98,9 +113,11 @@ func (query Query) rows(f func(*sql.Rows) (Result, error)) []Result {
 	if Debug >= 2 {
 		fmt.Println("Query:", query.sql, query.args)
 	}
+	lastQuery = query
+	QueryCount++
 	rows, err := db.Query(query.sql, query.args...)
 	if err != nil {
-		fmt.Println("Error querying database:", err)
+		dberr(err, "rows")
 		return nil
 	}
 	defer rows.Close()
@@ -109,7 +126,7 @@ func (query Query) rows(f func(*sql.Rows) (Result, error)) []Result {
 	for rows.Next() {
 		result, err := f(rows)
 		if err != nil {
-			fmt.Println("Error parsing row:", err)
+			dberr(err, "rows")
 		} else if result != nil {
 			results = append(results, result)
 		}
@@ -124,9 +141,11 @@ func (query Query) row(f func(*sql.Rows) (Result, error)) Result {
 	if Debug >= 2 {
 		fmt.Println("Query:", query.sql, query.args)
 	}
+	lastQuery = query
+	QueryCount++
 	rows, err := db.Query(query.sql, query.args...)
 	if err != nil {
-		fmt.Println("Error querying database:", err)
+		dberr(err, "row")
 		return nil
 	}
 	defer rows.Close()
@@ -134,7 +153,7 @@ func (query Query) row(f func(*sql.Rows) (Result, error)) Result {
 	if rows.Next() {
 		result, err := f(rows)
 		if err != nil {
-			fmt.Println("Error decoding row:", err)
+			dberr(err, "row")
 		} else {
 			return result
 		}

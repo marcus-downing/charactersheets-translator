@@ -91,6 +91,7 @@
 			{{ if gt $count 1 }}
 				<span class='badge'>{{ $count }}</span>
 			{{ end }}
+			{{ if isConflicted $lang $entry }}<span class='glyphicon glyphicon-alert red-icon'></span>{{ end }}
 		{{ end }}
 	</td>
 	{{ end }}

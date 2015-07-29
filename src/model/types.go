@@ -23,6 +23,12 @@ func hash64(data string) uint64 {
 	return hash64
 }
 
+func parseID(rows *sql.Rows) (Result, error) {
+	var id uint64
+	err := rows.Scan(&id)
+	return id, err
+}
+
 // ** Entries
 
 type Entry struct {
@@ -167,6 +173,11 @@ func (entry *Entry) CountTranslations() map[string]int {
 }
 
 func (entry *Entry) GetParts() []*Entry {
+	if entry.PartOf == "" {
+		entries := make([]*Entry, 1)
+		entries[0] = entry
+		return entries
+	}
 	results := query("select "+entryFields+" from Entries where PartOf = ?", entry.PartOf).rows(parseEntry)
 	return makeEntries(results)
 }
@@ -351,6 +362,29 @@ func (es *EntrySource) Save() {
 	saveRecord("EntrySources", keyfields, fields)
 }
 
+type EntrySourcePlaceholder struct {
+	SourceID uint64
+	Count    int
+}
+
+func parseEntrySourcePlaceholder(rows *sql.Rows) (Result, error) {
+	placeholder := EntrySourcePlaceholder{}
+	err := rows.Scan(&placeholder.SourceID, &placeholder.Count)
+	return placeholder, err
+}
+
+func GetSourceIDsForEntry(entry *Entry) []EntrySourcePlaceholder {
+	results := query("select SourceID, Count from EntrySources where EntryID = ?", entry.ID()).rows(parseEntrySourcePlaceholder)
+
+	sources := make([]EntrySourcePlaceholder, len(results))
+	for i, result := range results {
+		if id, ok := result.(EntrySourcePlaceholder); ok {
+			sources[i] = id
+		}
+	}
+	return sources
+}
+
 // ** Translations
 
 type Translation struct {
@@ -451,6 +485,7 @@ func (translation *Translation) Save() {
 		"Translator":  translation.Translator,
 		"Translation": translation.Translation,
 		"IsPreferred": translation.IsPreferred,
+		"IsConflicted": translation.IsConflicted,
 	}
 	saveRecord("Translations", keyfields, fields)
 	ClearVotes(translation)
@@ -507,9 +542,7 @@ func (entry *Entry) GetTranslationVotes(language string) []*Vote {
 
 func (vote *Vote) Save() {
 	keyfields := map[string]interface{}{
-		"EntryID":    vote.Translation.Entry.ID(),
-		"Language":   vote.Translation.Language,
-		"Translator": vote.Translation.Translator,
+		"TranslationID": vote.Translation.ID(),
 		"Voter":      vote.Voter.Email,
 	}
 	fields := map[string]interface{}{
@@ -520,9 +553,7 @@ func (vote *Vote) Save() {
 
 func DeleteVote(vote *Vote) {
 	keyfields := map[string]interface{}{
-		"EntryID":    vote.Translation.Entry.ID(),
-		"Language":   vote.Translation.Language,
-		"Translator": vote.Translation.Translator,
+		"TranslationID": vote.Translation.ID(),
 		"Voter":      vote.Voter.Email,
 	}
 	deleteRecord("Votes", keyfields)
@@ -530,17 +561,14 @@ func DeleteVote(vote *Vote) {
 
 func ClearVotes(translation *Translation) {
 	keyfields := map[string]interface{}{
-		"EntryID":    translation.Entry.ID(),
-		"Language":   translation.Language,
-		"Translator": translation.Translator,
+		"TranslationID": translation.ID(),
 	}
 	deleteRecord("Votes", keyfields)
 }
 
 func ClearOtherVotes(translation *Translation) {
 	keyfields := map[string]interface{}{
-		"EntryID":  translation.Entry.ID(),
-		"Language": translation.Language,
+		"TranslationID": translation.ID(),
 		"Vote":     true,
 	}
 	deleteRecord("Votes", keyfields)
@@ -610,7 +638,7 @@ func GetUsersByLanguage(language string) []*User {
 }
 
 func GetLanguageLead(language string) *User {
-	result := query("select Email, "+userFields+" from Users where Language = ? and IsLanguageLead = 1", language).row(parseUser)
+	result := query("select "+userFields+" from Users where Language = ? and IsLanguageLead = 1", language).row(parseUser)
 	if result != nil {
 		if user, ok := result.(User); ok {
 			return &user

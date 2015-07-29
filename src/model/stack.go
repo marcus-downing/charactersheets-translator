@@ -33,6 +33,7 @@ func stackEntries(entries []*Entry) []*StackedEntry {
 	}
 
 	// put entries in order
+	fmt.Println("Sorting enties")
 	values := make([]*StackedEntry, 0, len(stacks)+len(unstacked))
 	for _, stack := range stacks {
 		sort.Sort(entriesByIndex(stack))
@@ -48,12 +49,22 @@ func stackEntries(entries []*Entry) []*StackedEntry {
 		})
 	}
 
+	// load sources
+	fmt.Println("Loading sources")
+	sources := make(map[uint64]*Source, 500)
+	for _, source := range GetSources() {
+		sources[source.ID()] = source
+	}
+
 	// calculate totals
+	fmt.Println("Calculating totals")
 	for _, se := range values {
 		entrySources := make(map[uint64]*EntrySource, len(se.Entries)*10)
 		for _, entry := range se.Entries {
-			for _, es := range GetSourcesForEntry(entry) {
-				entrySources[es.Source.ID()] = es
+			for _, placeholder := range GetSourceIDsForEntry(entry) {
+				if source, ok := sources[placeholder.SourceID]; ok {
+					entrySources[placeholder.SourceID] = &EntrySource{*entry, *source, placeholder.Count}
+				}
 			}
 		}
 		count := 0
@@ -65,6 +76,7 @@ func stackEntries(entries []*Entry) []*StackedEntry {
 		se.EntrySources = esv
 		se.Count = count
 	}
+	fmt.Println("Final sort")
 	sort.Sort(stacksByName(values))
 	sort.Sort(stacksByCount(values))
 	return values
@@ -77,6 +89,15 @@ func GetStackedEntries(game, level, show, search, language string, user *User) [
 	}
 	entries := GetEntriesAt(game, leveln, show, search, language, user)
 	return stackEntries(entries)
+}
+
+func (e *Entry) GetStackedEntry() *StackedEntry {
+	entries := e.GetParts()
+	stacked := stackEntries(entries)
+	if len(stacked) == 0 {
+		return nil
+	}
+	return stacked[0]
 }
 
 /* Stacked Translations */
@@ -96,27 +117,57 @@ func (se *StackedEntry) GetTranslations(language string) []*StackedTranslation {
 	}
 
 	stackedTranslations := make([]*StackedTranslation, 0, len(translations))
-	for translator, parts := range translations {
-		stacked := StackedTranslation{
-			Entry:      se,
-			Language:   language,
-			Translator: translator,
-			Parts:      parts,
-		}
+	for _, parts := range translations {
+		stacked := makeStackedTranslation(se, parts)
 		if !stacked.Empty() {
-			stackedTranslations = append(stackedTranslations, &stacked)
+			stackedTranslations = append(stackedTranslations, stacked)
 		}
 	}
 	return stackedTranslations
 }
 
+func makeStackedTranslation(entry *StackedEntry, parts []*Translation) *StackedTranslation {
+	isPreferred := false
+	isConflicted := false
+	language := parts[0].Language
+	translator := parts[0].Translator
+	for _, part := range parts {
+		if part.IsPreferred {
+			isPreferred = true
+		}
+		if part.IsConflicted {
+			isConflicted = true
+		}
+	}
+	
+	text := make([]string, len(parts))
+	for i, part := range parts {
+		text[i] = part.Translation
+	}
+	fullText := strings.Join(text, "")
+
+	stack := StackedTranslation{
+		Entry:        entry,
+		Language:     language,
+		Translator:   translator,
+		Parts:        parts,
+		Count:        len(parts),
+		FullText:     fullText,
+		IsPreferred:  isPreferred,
+		IsConflicted: isConflicted,
+	}
+	return &stack
+}
+
 type StackedTranslation struct {
-	Entry       *StackedEntry
-	Language    string
-	Translator  string
-	Parts       []*Translation
-	Count       int
-	IsPreferred bool
+	Entry        *StackedEntry
+	Language     string
+	Translator   string
+	Parts        []*Translation
+	Count        int
+	FullText     string
+	IsPreferred  bool
+	IsConflicted bool
 }
 
 func (st *StackedTranslation) Empty() bool {
@@ -126,14 +177,6 @@ func (st *StackedTranslation) Empty() bool {
 		}
 	}
 	return true
-}
-
-func (st *StackedTranslation) FullText() string {
-	text := make([]string, len(st.Parts))
-	for i, part := range st.Parts {
-		text[i] = part.Translation
-	}
-	return strings.Join(text, "")
 }
 
 func (se *StackedEntry) GetTranslationBy(language, translator string) *StackedTranslation {
@@ -149,14 +192,7 @@ func (se *StackedEntry) GetTranslationBy(language, translator string) *StackedTr
 			}
 		}
 	}
-	stacked := StackedTranslation{
-		Entry:      se,
-		Language:   language,
-		Translator: translator,
-		Parts:      parts,
-		Count:      len(parts),
-	}
-	return &stacked
+	return makeStackedTranslation(se, parts)
 }
 
 func (se *StackedEntry) CountTranslations() map[string]int {
@@ -179,87 +215,6 @@ func (se *StackedEntry) CountTranslations() map[string]int {
 		}
 	}
 	return langCounts
-}
-
-func (st *StackedTranslation) GetVotes() []*Vote {
-	// entry := st.Entry.Entries[0]
-	results := query("select "+voteFields+" from Votes where TranslationID = ?", st.Parts[0].ID()).rows(parseVote)
-
-	votes := make([]*Vote, len(results))
-	for i, result := range results {
-		if vote, ok := result.(Vote); ok {
-			votes[i] = &vote
-		}
-	}
-	return votes
-}
-
-func GetPreferredTranslations(language string) []*StackedTranslation {
-	lead := GetLanguageLead(language)
-	var leadEmail string = ""
-	if lead != nil {
-		leadEmail = lead.Email
-	}
-
-	entries := stackEntries(GetEntries())
-	pref := make([]*StackedTranslation, 0, len(entries))
-	for _, entry := range entries {
-		translations := entry.GetTranslations(language)
-		selected := SelectPreferredTranslation(entry, language, translations, leadEmail)
-		if selected != nil {
-			pref = append(pref, selected)
-		}
-	}
-
-	return pref
-}
-
-func SelectPreferredTranslation(entry *StackedEntry, language string, translations []*StackedTranslation, lead string) *StackedTranslation {
-	if len(translations) == 0 {
-		return nil
-	}
-	if len(translations) == 1 {
-		return translations[0]
-	}
-
-	//  count scores for the text of a translation, so duplicates are merged
-	//  votes are worth two; language lead is worth one (so it's a tie-breaker)
-	scores := make(map[string]int, len(translations))
-
-	for _, st := range translations {
-		text := st.FullText()
-		scores[text] = 0
-		votes := st.GetVotes()
-		for _, vote := range votes {
-			if vote.Vote {
-				scores[text] += 2
-			} else {
-				scores[text] -= 2
-			}
-		}
-		if st.Translator == lead {
-			scores[text]++
-		}
-	}
-
-	//  get translations from people who haven't voted
-
-	//  pick the highest score
-	highestText := ""
-	highestScore := 0
-	for text, score := range scores {
-		if score > highestScore {
-			highestScore = score
-			highestText = text
-		}
-	}
-	for _, st := range translations {
-		text := st.FullText()
-		if text == highestText {
-			return st
-		}
-	}
-	return translations[0]
 }
 
 // sort stacked entries by name
@@ -291,3 +246,4 @@ func (this stacksByCount) Less(i, j int) bool {
 func (this stacksByCount) Swap(i, j int) {
 	this[i], this[j] = this[j], this[i]
 }
+
