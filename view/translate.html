@@ -120,7 +120,7 @@
 				<tr class='other-translation'>
 					<td class='btn-cell'>
 						{{ if $translation.IsPreferred }}<span class='glyphicon glyphicon-circle-arrow-right green-icon'></span>{{ end }}
-						{{ if and (not $translation.IsPreferred) (not $translation.IsConflicted) }}<span class='glyphicon glyphicon-ban grey-icon'></span>{{ end }}
+						{{ if and (not $translation.IsPreferred) (not $translation.IsConflicted) }}<span class='glyphicon glyphicon-ban-circle grey-icon'></span>{{ end }}
 						{{ if $translation.IsConflicted }}<span class='glyphicon glyphicon-exclamation-sign red-icon'></span>{{ end }}
 					</td>
 					<td class='btn-cell'><img src='http://www.gravatar.com/avatar/{{ md5 $translation.Translator }}?s=24'></td>
@@ -142,7 +142,7 @@
 			<tr class='my-translation'>
 				<td class='btn-cell'>
 					{{ if $myTranslation.IsPreferred }}<span class='glyphicon glyphicon-circle-arrow-right green-icon'></span>{{ end }}
-					{{ if and (not $myTranslation.IsPreferred) (not $myTranslation.IsConflicted) }}<span class='glyphicon glyphicon-ban grey-icon'></span>{{ end }}
+					{{ if and (not $myTranslation.IsPreferred) (not $myTranslation.IsConflicted) }}<span class='glyphicon glyphicon-ban-circle grey-icon'></span>{{ end }}
 					{{ if $myTranslation.IsConflicted }}<span class='glyphicon glyphicon-exclamation-sign red-icon'></span>{{ end }}
 				</td>
 				<td class='btn-cell'><img src='http://www.gravatar.com/avatar/{{ md5 $currentUser.Email }}?s=24'></td>

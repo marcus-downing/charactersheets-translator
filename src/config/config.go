@@ -22,6 +22,7 @@ type Configuration struct {
 	PDF         pdfConfig      `toml:"pdf"`
 	Database    databaseConfig `toml:"db"`
 	OldDatabase databaseConfig `toml:"old_db"`
+	Github      githubConfig   `toml:"github"`
 }
 
 type serverConfig struct {
@@ -38,6 +39,10 @@ type databaseConfig struct {
 	Database string `toml:"db"`
 	Username string `toml:"user"`
 	Password string `toml:"password"`
+}
+
+type githubConfig struct {
+	AccessToken string `toml:"access_token"`
 }
 
 // loading the config

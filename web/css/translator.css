@@ -53,6 +53,13 @@ form.panel-view-form {
   white-space: nowrap;
 }
 
+.summary, .summary p, .summary blockquote, .summary blockquote p {
+  font-size: 14px;
+}
+
+.summary blockquote {
+  padding-right: 0;
+}
 
 /* Registration and Sign In */
 
@@ -239,11 +246,15 @@ a.reveal-sources {
 }
 
 .green-icon {
-  color: #0a0;
+  color: #1a1;
 }
 
 .red-icon {
   color: #a00;
+}
+
+.grey-icon {
+  color: #bbb;
 }
 
 

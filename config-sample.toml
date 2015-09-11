@@ -22,3 +22,7 @@ host = "localhost"
 db = ""
 user = ""
 password = ""
+
+[github]
+
+access_token = ""

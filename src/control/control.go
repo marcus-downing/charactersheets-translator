@@ -33,6 +33,7 @@ type TemplateData struct {
 	LanguageNames      map[string]string
 	LanguageCompletion map[string][4]int
 	Users              []*model.User
+	UsersByLanguage    map[string][]*model.User
 	Sources            []*model.Source
 	Entries            []*model.StackedEntry
 	Translations       []*model.Translation
@@ -40,6 +41,12 @@ type TemplateData struct {
 	CurrentLevel       string
 	CurrentShow        string
 	CurrentSearch      string
+	NumIssues          int
+	Issues             []Issue
+	NumWebsiteIssues   int
+	WebsiteIssues      []Issue
+	NumTranslatorIssues   int
+	TranslatorIssues      []Issue
 }
 
 type Pagination struct {
@@ -432,6 +439,8 @@ var templateFuncs = template.FuncMap{
 	"isConflicted":           isConflicted,
 }
 
+// var partials = template.ParseGlob("view/inc/*"))
+
 func renderTemplate(name string, w http.ResponseWriter, r *http.Request, dataproc func(data TemplateData) TemplateData) {
 	var data = GetTemplateData(r, name)
 	if dataproc != nil {
@@ -443,6 +452,13 @@ func renderTemplate(name string, w http.ResponseWriter, r *http.Request, datapro
 	if err != nil {
 		fmt.Fprint(w, "Error:", err)
 		fmt.Println("Error:", err)
+		return
+	}
+	t, err = t.ParseGlob("view/inc/*")
+	if err != nil {
+		fmt.Fprint(w, "Error:", err)
+		fmt.Println("Error:", err)
+		return
 	}
 	err = t.Execute(w, data)
 	if err != nil {
