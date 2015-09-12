@@ -15,11 +15,15 @@
 
 {{ template "forum" . }}
 
+{{ template "github" . }}
+
+{{ if not .IsAdmin }}
 {{ template "completion" . }}
+{{ end }}
 
 <hr>
 
-{{ template "github-translator" . }}
+{{ template "issues-translator" . }}
 
 </div>
 
@@ -39,7 +43,7 @@
 
 <hr>
 
-{{ template "github-website" . }}
+{{ template "issues-website" . }}
 
 </div>
 
@@ -47,7 +51,7 @@
 
 <div class='col-sm-4'>
 
-{{ template "github" . }}
+{{ template "issues-main" . }}
 
 </div>
 

@@ -1,4 +1,4 @@
-{{ define "github-translator" }}
+{{ define "issues-translator" }}
 
 <div class='panel panel-warning'>
 	<div class="panel-heading"><h3 class="panel-title"><span class="glyphicon glyphicon-pencil"></span>&nbsp; Translator: {{ .NumTranslatorIssues }} open issues</h3></div>

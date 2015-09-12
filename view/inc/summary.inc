@@ -15,6 +15,10 @@
 		<div class='panel-body profile'>
 				<div class=''>
 					<p>{{ $profile.LevelName }}: <b>{{ $profile.CompletedPercent }}%</b></p>
+					<div class='progress'>
+					<div class='progress-bar progress-bar' style='width: {{ $profile.CompletedPercent }}%'>
+					</div>
+					</div>
 					<p class='lang-counts'>
 						{{ if $profile.ByMeAlone }}
 							<a class='lang-count lang-count-mine' href='/translate?level={{ $profile.Level }}&amp;show=mine'>

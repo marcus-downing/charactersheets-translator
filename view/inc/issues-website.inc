@@ -1,4 +1,4 @@
-{{ define "github-website" }}
+{{ define "issues-website" }}
 
 <div class='panel panel-warning'>
 	<div class="panel-heading"><h3 class="panel-title"><span class="glyphicon glyphicon-pencil"></span>&nbsp; Website: {{ .NumWebsiteIssues }} open issues</h3></div>
