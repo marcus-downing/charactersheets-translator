@@ -142,7 +142,9 @@ func (entry *StackedEntry) RankTranslations(translations []*StackedTranslation, 
 		}
 	}
 
-	fmt.Println("Voting scores:", scores)
+	if Debug >= 2 {
+		fmt.Println("Voting scores:", scores)
+	}
 
 	// get translations from people who haven't upvoted
 	// for _, translation := range translations {
@@ -174,7 +176,7 @@ func (entry *StackedEntry) RankTranslations(translations []*StackedTranslation, 
 		}
 	}
 	isConflicted := numNearTopRank > 1
-	if isConflicted {
+	if isConflicted && Debug >= 1 {
 		fmt.Println("Conflict!", numNearTopRank, "translations for:", entry.FullText)
 	}
 
@@ -187,7 +189,9 @@ func (entry *StackedEntry) RankTranslations(translations []*StackedTranslation, 
 			part.IsConflicted = translation.IsConflicted
 			part.IsPreferred = translation.IsPreferred
 			if save {
-				fmt.Println("Saving translation part:", part)
+				if Debug >= 2 {
+					fmt.Println("Saving translation part:", part)
+				}
 				part.Save()
 			}
 		}

@@ -116,6 +116,9 @@ func importMasterData(data []map[string]string) {
 		time.Sleep(sleepTime)
 	}
 	fmt.Println("Import complete")
+
+	model.MarkAllConflicts()
+	fmt.Println("Conflicts marked")
 }
 
 func importTranslationData(data []map[string]string, language string, translator *model.User) {
@@ -141,6 +144,9 @@ func importTranslationData(data []map[string]string, language string, translator
 		num++
 	}
 	fmt.Println("Import complete:", num, "of", len(data))
+	
+	model.MarkAllConflicts()
+	fmt.Println("Conflicts marked")
 }
 
 func ImportHandler(w http.ResponseWriter, r *http.Request) {
