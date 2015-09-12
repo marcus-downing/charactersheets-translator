@@ -93,12 +93,14 @@ func GetEntriesAt(game string, level int, show, search, language string, transla
 		"inner join EntrySources on Entries.EntryID = EntrySources.EntryID " +
 		"inner join Sources on EntrySources.SourceID = Sources.SourceID"
 	if show == "conflicts" {
-		sql = sql + " inner join Translations Mine on EntryID = Mine.EntryID and Mine.Language = ? and Mine.Translator = ?" +
-			"inner join Translations Others on Entries.EntryID = Others.EntryID and Others.Language = ? and Others.Translator != ?"
+		sql = sql + " inner join Translations on Entries.EntryID = Translations.EntryID and Translations.Language = ?"
 		args = append(args, language)
-		args = append(args, translator.Email)
-		args = append(args, language)
-		args = append(args, translator.Email)
+		// sql = sql + " inner join Translations Mine on EntryID = Mine.EntryID and Mine.Language = ? and Mine.Translator = ?" +
+		// 	"inner join Translations Others on Entries.EntryID = Others.EntryID and Others.Language = ? and Others.Translator != ?"
+		// args = append(args, language)
+		// args = append(args, translator.Email)
+		// args = append(args, language)
+		// args = append(args, translator.Email)
 	} else if show == "mine" {
 		sql = sql + " inner join Translations Mine on Entries.EntryID = Mine.EntryID and Mine.Language = ? and Mine.Translator = ?"
 		args = append(args, language)
@@ -122,7 +124,8 @@ func GetEntriesAt(game string, level int, show, search, language string, transla
 		args = append(args, level)
 	}
 	if show == "conflicts" {
-		sql = sql + " and Mine.Translation = Others.Translation"
+		sql = sql + " and Translations.IsConflicted = 1"
+		// sql = sql + " and Mine.Translation = Others.Translation"
 	}
 	// if show != "" {
 	// 	sql = sql+" and Translations.Language = ?"
@@ -272,9 +275,10 @@ func GetSourcesAt(game string, level int, show string) []*Source {
 
 func (source *Source) Save() {
 	keyfields := map[string]interface{}{
-		"Filepath": source.Filepath,
+		"SourceID": source.ID(),
 	}
 	fields := map[string]interface{}{
+		"Filepath": source.Filepath,
 		"Page":   source.Page,
 		"Volume": source.Volume,
 		"Level":  source.Level,
@@ -354,7 +358,7 @@ func GetSourcesForEntry(entry *Entry) []*EntrySource {
 func (es *EntrySource) Save() {
 	keyfields := map[string]interface{}{
 		"EntryID":    es.Entry.ID(),
-		"SourcePath": es.Source.Filepath,
+		"SourceID": es.Source.ID(),
 	}
 	fields := map[string]interface{}{
 		"Count": es.Count,

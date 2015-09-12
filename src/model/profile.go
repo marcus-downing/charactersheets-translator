@@ -85,13 +85,19 @@ func ProfileTranslations(user *User) [4]*TranslationProfile {
 			") as qs", level, lang, user.Email).count()
 		fmt.Println(" -- by both =", byboth)
 
+		// conflict := query("select count(*) from (select A.EntryID from Translations A "+
+		// 	"inner join Translations B on A.EntryID = B.EntryID and A.Language = B.Language and A.Translator != B.Translator and A.Translation != B.Translation "+
+		// 	"inner join EntrySources on A.EntryID = EntrySources.EntryID "+
+		// 	"inner join Sources on Sources.SourceID = EntrySources.SourceID and Sources.Level = ? "+
+		// 	"where A.Language = ? and A.Translator = ? "+
+		// 	"group by A.EntryID"+
+		// 	") as qs", level, lang, user.Email).count()
 		conflict := query("select count(*) from (select A.EntryID from Translations A "+
-			"inner join Translations B on A.EntryID = B.EntryID and A.Language = B.Language and A.Translator != B.Translator and A.Translation != B.Translation "+
 			"inner join EntrySources on A.EntryID = EntrySources.EntryID "+
 			"inner join Sources on Sources.SourceID = EntrySources.SourceID and Sources.Level = ? "+
-			"where A.Language = ? and A.Translator = ? "+
+			"where A.Language = ? and A.IsConflicted = 1 "+
 			"group by A.EntryID"+
-			") as qs", level, lang, user.Email).count()
+			") as qs", level, lang).count()
 		fmt.Println(" -- conflicting =", conflict)
 
 		total64 := float64(total) + 0.0001
