@@ -375,7 +375,7 @@ func previewExists(language string, source *model.Source) bool {
 	path := source.Filepath
 	path = strings.Replace(path, "3.5", "dnd35", 1)
 	path = strings.Replace(path, "Pathfinder", "pathfinder", 1)
-	fullPath := "../../Composer 2.1.3/public/pdf/" + languagePath + "/" + path + ".pdf"
+	fullPath := config.Config.PDF.Path + "/" + languagePath + "/" + path + ".pdf"
 
 	fi, err := os.Stat(fullPath)
 	return err == nil && !fi.IsDir()
