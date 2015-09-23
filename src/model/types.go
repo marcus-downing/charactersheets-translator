@@ -293,11 +293,13 @@ func (source *Source) GetLanguageCompletion() map[string]int {
 	total := query("select count(distinct Entries.EntryID) from Entries "+
 		"inner join EntrySources on Entries.EntryID = EntrySources.EntryID "+
 		"where EntrySources.SourceID = ?", source.ID()).count()
-	for _, lang := range Languages {
-		count := query("select count(distinct Translations.EntryID) from Translations "+
-			"inner join EntrySources on Translations.EntryID = EntrySources.EntryID "+
-			"where EntrySources.SourceID = ? and Language = ?", source.ID(), lang).count()
-		completion[lang] = 100 * count / total
+	if total > 0 {
+		for _, lang := range Languages {
+			count := query("select count(distinct Translations.EntryID) from Translations "+
+				"inner join EntrySources on Translations.EntryID = EntrySources.EntryID "+
+				"where EntrySources.SourceID = ? and Language = ?", source.ID(), lang).count()
+			completion[lang] = 100 * count / total
+		}
 	}
 	return completion
 }
