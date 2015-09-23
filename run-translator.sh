@@ -5,4 +5,4 @@ if pgrep translator &> /dev/null; then
 fi
 
 cd /data/charsheets/charactersheets-translator
-./translator &> /var/log/translator &
+./translator &>> /var/log/translator &
