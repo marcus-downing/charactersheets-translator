@@ -1,5 +1,7 @@
 {{ define "summary" }}
 
+{{ if not ( eq .CurrentUser.Language "gb" ) }}
+
 <div class='panel panel-info'>
 	<div class='panel-heading'><h3 class='panel-title'><span class="glyphicon glyphicon-globe"></span>&nbsp; 
 		{{ if .CurrentUser.IsAdmin }}Translation summary{{ else }}Your translations{{ end }}</h3></div>
@@ -65,5 +67,7 @@
 		<a class='btn btn-link' href='/entries'><span class="glyphicon glyphicon-certificate"></span>&nbsp; Entries</a>
 	</div>
 </div>
+
+{{ end }}
 
 {{ end }}

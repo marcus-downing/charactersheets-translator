@@ -1,6 +1,6 @@
 {{ define "github" }}
 
-<div class='panel panel-warning'>
+<div class='panel panel-success'>
 	<div class="panel-heading"><h3 class="panel-title"><span class="glyphicon glyphicon-pencil"></span>&nbsp; Open Source</h3></div>
 	<div class="panel-body" style='padding: 1em; text-align: center;'>
 		<a href='https://github.com/marcusatbang/charactersheets'><img src='/images/github-logo.png' width='240'></a>

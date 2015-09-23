@@ -1,7 +1,7 @@
 {{ define "issues-main" }}
 
 <div class='panel panel-warning'>
-	<div class="panel-heading"><h3 class="panel-title"><span class="glyphicon glyphicon-pencil"></span>&nbsp; {{ .NumIssues }} open issues</h3></div>
+	<div class="panel-heading"><h3 class="panel-title"><span class="glyphicon glyphicon-pencil"></span>&nbsp; Main: {{ .NumIssues }} open issues</h3></div>
 	<table class="table">
 		{{ $issues := .Issues }}
 		{{ range $issue := $issues }}
