@@ -135,6 +135,10 @@ func main() {
 				fmt.Println("Error reading translation:", err)
 				continue
 			}
+			if translation.Entry.Original == "(Round down)" && translation.Language == "pl" {
+				fmt.Println(" *** Transferring: (Round down) =", translation.Translation)
+			}
+
 			_, err = db2.Exec("insert into Translations(TranslationID, EntryID, Language, Translator, Translation, IsPreferred, IsConflicted) values (?,?,?,?,?,?,?)",
 				translation.ID(), translation.Entry.ID(), translation.Language, translation.Translator, translation.Translation, translation.IsPreferred, false)
 			n_translations++
