@@ -2,6 +2,7 @@ package control
 
 import (
 	"../model"
+	"../config"
 	// "code.google.com/p/go.crypto/bcrypt"
 	"crypto/md5"
 	"encoding/hex"
