@@ -47,7 +47,7 @@
         {{ end }}
         <li id='nav-users'><a href="/users"><span class="glyphicon glyphicon-user"></span> Users</a></li>
       </ul>
-      <p class="navbar-text navbar-right visible-md visible-lg">Signed in as &nbsp; <img src='http://www.gravatar.com/avatar/{{ md5 .CurrentUser.Email }}?s=24'>&nbsp; {{ .CurrentUser.Name }}</p>
+      <p class="navbar-text navbar-right visible-md visible-lg">Signed in as &nbsp; <img src='http://www.gravatar.com/avatar/{{ md5 .CurrentUser.Email }}?s=24' class="gravatar-24">&nbsp; {{ .CurrentUser.Name }}</p>
     </div><!--/.nav-collapse -->
   </div>
 </div>

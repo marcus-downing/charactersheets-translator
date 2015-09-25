@@ -5,7 +5,7 @@
 	<table class='table'>
 	{{ range $recent := .RecentUsers }}
 	<tr>
-		<td style="width: 32px;"><img src='http://www.gravatar.com/avatar/{{ md5 $recent.User.Email }}?s=32'></td>
+		<td style="width: 32px;"><img src='http://www.gravatar.com/avatar/{{ md5 $recent.User.Email }}?s=32' class="gravatar-32"></td>
 		<td>
 			<b>{{ $recent.User.Name }}</b>
 			<div>{{ $recent.LoggedInFor }}</div>

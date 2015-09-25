@@ -12,7 +12,7 @@
 					{{ $issue.SummaryHTML }}
 				</div>
 			</td>
-			<td><img src="{{ $issue.User.Avatar }}" width="24" height="24"></td>
+			<td><img src="{{ $issue.User.Avatar }}" class="gravatar-32"></td>
 		</tr>
 		{{ end }}
 	</table>

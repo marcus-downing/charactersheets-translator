@@ -20,6 +20,28 @@ body.users #nav-users a
 #footer {
 }
 
+.gravatar-24 {
+  width: 24px;
+  height: 24px;
+  border-radius: 12px;
+}
+
+.gravatar-32 {
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+}
+
+.gravatar-64 {
+  width: 64px;
+  height: 64px;
+  border-radius: 32px;
+}
+
+.gravatar-shadow {
+  box-shadow: 0 3px 3px rgba(0,0,0,0.5);
+}
+
 /* Navigation */
 
 .search-bar {
@@ -131,7 +153,7 @@ form.panel-view-form {
 } 
 
 .issues-table td:last-child {
-  width: 40px;
+  width: 48px;
 }
 
 .issues-table td {

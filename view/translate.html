@@ -123,7 +123,7 @@
 						{{ if and (not $translation.IsPreferred) (not $translation.IsConflicted) }}<span class='glyphicon glyphicon-ban-circle grey-icon'></span>{{ end }}
 						{{ if $translation.IsConflicted }}<span class='glyphicon glyphicon-exclamation-sign red-icon'></span>{{ end }}
 					</td>
-					<td class='btn-cell'><img src='http://www.gravatar.com/avatar/{{ md5 $translation.Translator }}?s=24'></td>
+					<td class='btn-cell'><img src='http://www.gravatar.com/avatar/{{ md5 $translation.Translator }}?s=24' class="gravatar-24"></td>
 					<td class='translation-parts'>
 						{{ range $part := $translation.Parts }}
 							<label class='part'>{{ $part.Translation }}</label>
@@ -145,7 +145,7 @@
 					{{ if and (not $myTranslation.IsPreferred) (not $myTranslation.IsConflicted) }}<span class='glyphicon glyphicon-ban-circle grey-icon'></span>{{ end }}
 					{{ if $myTranslation.IsConflicted }}<span class='glyphicon glyphicon-exclamation-sign red-icon'></span>{{ end }}
 				</td>
-				<td class='btn-cell'><img src='http://www.gravatar.com/avatar/{{ md5 $currentUser.Email }}?s=24'></td>
+				<td class='btn-cell'><img src='http://www.gravatar.com/avatar/{{ md5 $currentUser.Email }}?s=24' class="gravatar-24"></td>
 				<td class='translation-parts'>
 					<span class='my-translation-arrow-score'></span><span class='my-translation-arrow'></span>
 					{{ range $j, $part := $myTranslation.Parts }}

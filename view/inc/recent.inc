@@ -5,7 +5,7 @@
 	<table class='table'>
 	<tr>
 		<td>Knowledge: Dungeoneering</td>
-		<td><img src='http://www.gravatar.com/avatar/85da34890f23a1fbd629bacc8b6bb81a?s=24'></td>
+		<td><img src='http://www.gravatar.com/avatar/85da34890f23a1fbd629bacc8b6bb81a?s=24' class="gravatar-24"></td>
 		<td><img src='/images/flags/it.png'></td>
 		<td>Conoscenze: Dungeon</td>
 	</tr>
