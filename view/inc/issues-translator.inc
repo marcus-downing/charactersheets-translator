@@ -2,7 +2,7 @@
 
 <div class='panel panel-warning'>
 	<div class="panel-heading"><h3 class="panel-title"><span class="glyphicon glyphicon-pencil"></span>&nbsp; Translator: {{ .NumTranslatorIssues }} open issues</h3></div>
-	<table class="table">
+	<table class="table issues-table">
 		{{ $issues := .TranslatorIssues }}
 		{{ range $issue := $issues }}
 		<tr class="{{ $issue.CssClass }}">

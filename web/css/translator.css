@@ -121,6 +121,23 @@ form.panel-view-form {
   display: none;
 }
 
+.issues-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.issues-table th:first-child {
+  width: 32px;
+} 
+
+.issues-table td:last-child {
+  width: 40px;
+}
+
+.issues-table td {
+  overflow-x: hidden;
+}
+
 
 
 /* Users */
