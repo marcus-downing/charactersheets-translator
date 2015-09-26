@@ -21,25 +21,28 @@ body.users #nav-users a
 }
 
 .gravatar-24 {
-  width: 24px;
-  height: 24px;
-  border-radius: 12px;
+  width: 26px;
+  height: 26px;
+  border-radius: 13px;
+  border: 1px solid white;
 }
 
 .gravatar-32 {
-  width: 32px;
-  height: 32px;
-  border-radius: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+  border: 2px solid white;
 }
 
 .gravatar-64 {
-  width: 64px;
-  height: 64px;
-  border-radius: 32px;
+  width: 68px;
+  height: 68px;
+  border-radius: 34px;
+  border: 2px solid white;
 }
 
 .gravatar-shadow {
-  box-shadow: 0 3px 3px rgba(0,0,0,0.5);
+  box-shadow: 1px 3px 6px rgba(0,0,0,0.4);
 }
 
 /* Navigation */
