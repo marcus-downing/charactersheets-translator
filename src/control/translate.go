@@ -85,7 +85,9 @@ func importMasterData(data []map[string]string) {
 	sleepTime, _ := time.ParseDuration("5ms")
 	fmt.Println("Importing", len(data), "master records")
 	for _, record := range data {
-		// fmt.Println("Inserting translation:", record["Original"], ";", record["Part of"])
+		if model.Debug >= 2 {
+			fmt.Println("Inserting translation:", record["Original"], ";", record["Part of"])
+		}
 		entry := &model.Entry{
 			Original: record["Original"],
 			PartOf:   record["Part of"],
