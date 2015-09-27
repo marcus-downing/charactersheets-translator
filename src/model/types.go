@@ -487,6 +487,7 @@ func (translation *Translation) Save() {
 		"TranslationID": translation.ID(),
 	}
 	fields := map[string]interface{}{
+		"EntryID":     translation.Entry.ID(),
 		"Language":    translation.Language,
 		"Translator":  translation.Translator,
 		"Translation": translation.Translation,
