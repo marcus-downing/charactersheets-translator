@@ -143,7 +143,7 @@ func (entry *StackedEntry) RankTranslations(translations []*StackedTranslation, 
 	}
 
 	if Debug >= 2 {
-		fmt.Println("Voting scores:", scores)
+		fmt.Println(" - Voting scores:", scores)
 	}
 
 	// get translations from people who haven't upvoted
@@ -190,11 +190,15 @@ func (entry *StackedEntry) RankTranslations(translations []*StackedTranslation, 
 			part.IsPreferred = translation.IsPreferred
 			if save {
 				if Debug >= 2 {
-					fmt.Println("Saving translation part:", part)
+					fmt.Println(" - Saving translation part:", part)
 				}
-				part.Save()
+				part.Save(false)
 			}
 		}
+	}
+
+	if Debug >= 2 {
+		fmt.Println(" - Ranking for return")
 	}
 
 	// return the marked and ranked translations
@@ -212,6 +216,9 @@ func (se *StackedEntry) MarkConflicts(language string) {
 		fmt.Println("Marking conflicts in '"+se.FullText+"'")
 	}
 	translations := se.GetTranslations(language)
+	if Debug >= 1 {
+		fmt.Println("Ranking", len(translations), "translations")
+	}
 	se.RankTranslations(translations, true)
 }
 

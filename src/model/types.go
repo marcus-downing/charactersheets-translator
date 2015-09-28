@@ -482,7 +482,12 @@ func (entry *Entry) GetMatchingTranslation(language, translation string) *Transl
 	return nil
 }
 
-func (translation *Translation) Save() {
+func (translation *Translation) HasChanged() bool {
+	underlying := translation.Entry.GetTranslationBy(translation.Language, translation.Translator)
+	return underlying.Translation == translation.Translation
+}
+
+func (translation *Translation) Save(clearVotes bool) {
 	keyfields := map[string]interface{}{
 		"TranslationID": translation.ID(),
 	}
@@ -495,7 +500,9 @@ func (translation *Translation) Save() {
 		"IsConflicted": translation.IsConflicted,
 	}
 	saveRecord("Translations", keyfields, fields)
-	ClearVotes(translation)
+	if clearVotes {
+		ClearVotes(translation)
+	}
 }
 
 // ** Votes

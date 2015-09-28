@@ -141,7 +141,7 @@ func importTranslationData(data []map[string]string, language string, translator
 			Translation: t,
 			Translator:  translator.Email,
 		}
-		translation.Save()
+		translation.Save(true)
 		time.Sleep(sleepTime)
 		num++
 	}

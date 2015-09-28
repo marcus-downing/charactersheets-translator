@@ -44,7 +44,7 @@ func APITranslateHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Adding", language, "translation for:", entry.Original)
 
 	t := &model.Translation{entry, language, translation, user.Email, false, false}
-	t.Save()
+	t.Save(t.HasChanged())
 
 	// recalculate conflicts
 	stack := entry.GetStackedEntry()
@@ -55,7 +55,7 @@ func APITranslateHandler(w http.ResponseWriter, r *http.Request) {
 
 func APIVoteHandler(w http.ResponseWriter, r *http.Request) {
 	if model.Debug >= 1 {
-		fmt.Println("Vote handler")
+		fmt.Println(" * Vote handler")
 	}
 	user := GetCurrentUser(r)
 	if user == nil {
@@ -82,11 +82,15 @@ func APIVoteHandler(w http.ResponseWriter, r *http.Request) {
 	up := r.FormValue("up") == "true"
 	down := r.FormValue("down") == "true"
 	if up && down {
-		fmt.Println("Cannot be both down and up")
+		if model.Debug >= 1 {
+			fmt.Println("Cannot vote both down and up")
+		}
 		return
 	}
 
-	fmt.Println("Saving vote:", entry.Original, "=", translation, up, down)
+	if model.Debug >= 1 {
+		fmt.Println(" * Saving vote:", entry.Original, "=", translation, up, down)
+	}
 
 	model.ClearVotes(t)
 	if up {
@@ -99,6 +103,9 @@ func APIVoteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// recalculate conflicts
+	if model.Debug >= 1 {
+		fmt.Println(" * Checking for conflicts:")
+	}
 	stack := t.Entry.GetStackedEntry()
 	stack.MarkConflicts(language)
 
