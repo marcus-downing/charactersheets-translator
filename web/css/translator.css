@@ -47,6 +47,11 @@ body.users #nav-users a
 
 /* Navigation */
 
+.navbar-text {
+    margin-top: 13px;
+    margin-bottom: 13px;
+}
+
 .search-bar {
   text-align: right;
   padding-bottom: 25px;
