@@ -125,9 +125,11 @@
 					</td>
 					<td class='btn-cell'><img src='http://www.gravatar.com/avatar/{{/* md5 $translation.Translator */}}?s=24' class="gravatar-24"></td>
 					<td class='translation-parts'>
-						{{ range $translator := $translation.Translators }}
-							<img src='http://www.gravatar.com/avatar/{{ md5 $translator }}?s=24' class="gravatar-24">
-						{{ end }}
+						<span class='other-translators'>
+							{{ range $translator := $translation.Translators }}
+								<img src='http://www.gravatar.com/avatar/{{ md5 $translator }}?s=24' class="gravatar-24">
+							{{ end }}
+						</span>
 						{{ range $part := $translation.Translation.Parts }}
 							<label class='part'>{{ $part.Translation }}</label>
 						{{ end }}

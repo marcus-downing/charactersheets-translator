@@ -202,7 +202,7 @@ func md5sum(email string) string {
 
 type TranslationSet struct {
 	Entry        *model.StackedEntry
-	Others       []*model.StackedTranslation
+	Others       []GroupedTranslation
 	Mine         *model.StackedTranslation
 	Language     string
 	Count        int
@@ -211,10 +211,18 @@ type TranslationSet struct {
 	Untranslated bool
 }
 
+type GroupedTranslation struct {
+	Translation *model.StackedTranslation
+	Translator  string
+	Translators []string
+	IsPreferred bool
+}
+
 func getTranslationSet(entry *model.StackedEntry, language string, me *model.User) *TranslationSet {
 	translations := entry.GetTranslations(language)
 
-	others := make([]*model.StackedTranslation, 0, len(translations))
+	// others := make([]*model.StackedTranslation, 0, len(translations))
+	others := make(map[uint64]GroupedTranslation, len(translations))
 	var mine *model.StackedTranslation = nil
 	var isConflicted bool = false
 
@@ -223,7 +231,17 @@ func getTranslationSet(entry *model.StackedEntry, language string, me *model.Use
 			if translation.Translator == me.Email {
 				mine = translation
 			} else {
-				others = append(others, translation)
+				// group the others
+				id := translation.ID()
+				if group, ok := others[id]; ok {
+					group.Translators = append(group.Translators, translation.Translator)
+					if translation.IsPreferred {
+						group.IsPreferred = true
+					}
+					others[id] = group
+				} else {
+					others[id] = GroupedTranslation{translation, translation.Translator, []string{}, translation.IsPreferred}
+				}
 			}
 			if translation.IsConflicted {
 				isConflicted = true
@@ -235,9 +253,26 @@ func getTranslationSet(entry *model.StackedEntry, language string, me *model.Use
 		count++
 	}
 
+	othersGrouped := make([]GroupedTranslation, 0, len(others))
+	for _, group := range others {
+		for _, vote := range group.Translation.GetVotes() {
+			if vote.Vote {
+				if vote.Voter.Email != me.Email {
+					group.Translators = append(group.Translators, vote.Voter.Email)
+				}
+				// upvoters[translation.FullText] = append(upvoters[translation.FullText], vote.Voter.Email)
+			} else {
+				// downvoters[translation.FullText] = append(downvoters[translation.FullText], vote.Voter.Email)
+			}
+		}
+
+		othersGrouped = append(othersGrouped, group)
+		fmt.Println("Grouped translation:", group)
+	}
+
 	return &TranslationSet{
 		Entry:        entry,
-		Others:       others,
+		Others:       othersGrouped,
 		Mine:         mine,
 		Language:     language,
 		Count:        count,
@@ -271,11 +306,8 @@ func myTranslation(set *TranslationSet) *model.StackedTranslation {
 	return set.Mine
 }
 
-func otherTranslations(set *TranslationSet) []*model.StackedTranslation {
+func otherTranslations(set *TranslationSet) []GroupedTranslation {
 	fmt.Println("Return other translations:-")
-	for _, t := range set.Others {
-		fmt.Println(t)
-	}
 	return set.Others
 }
 

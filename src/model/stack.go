@@ -170,6 +170,10 @@ type StackedTranslation struct {
 	IsConflicted bool
 }
 
+func (st *StackedTranslation) ID() uint64 {
+	return hash64(st.Entry.FullText + " --- " + st.FullText)
+}
+
 func (st *StackedTranslation) Empty() bool {
 	for _, part := range st.Parts {
 		if part != nil && strings.TrimSpace(part.Translation) != "" {

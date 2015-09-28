@@ -360,7 +360,12 @@ tr.other-translation {
   margin-bottom: 4px;
 }
 tr.other-translation td.translation-parts {
-  padding-left: 18px;
+  padding-left: 16px;
+  /*padding-left: 0;*/
+}
+tr.other-translation td.translation-parts span.other-translators img {
+  margin-left: -20px;
+  margin-right: 20px;
 }
 .my-translation input {
   font-weight: bold;
