@@ -120,20 +120,23 @@
 				<tr class='other-translation'>
 					<td class='btn-cell'>
 						{{ if $translation.IsPreferred }}<span class='glyphicon glyphicon-circle-arrow-right green-icon'></span>{{ end }}
-						{{ if and (not $translation.IsPreferred) (not $translation.IsConflicted) }}<span class='glyphicon glyphicon-ban-circle grey-icon'></span>{{ end }}
-						{{ if $translation.IsConflicted }}<span class='glyphicon glyphicon-exclamation-sign red-icon'></span>{{ end }}
+						{{ if and (not $translation.IsPreferred) (not $translations.IsConflicted) }}<span class='glyphicon glyphicon-ban-circle grey-icon'></span>{{ end }}
+						{{ if $translations.IsConflicted }}<span class='glyphicon glyphicon-exclamation-sign red-icon'></span>{{ end }}
 					</td>
-					<td class='btn-cell'><img src='http://www.gravatar.com/avatar/{{ md5 $translation.Translator }}?s=24' class="gravatar-24"></td>
+					<td class='btn-cell'><img src='http://www.gravatar.com/avatar/{{/* md5 $translation.Translator */}}?s=24' class="gravatar-24"></td>
 					<td class='translation-parts'>
-						{{ range $part := $translation.Parts }}
+						{{ range $translator := $translation.Translators }}
+							<img src='http://www.gravatar.com/avatar/{{ md5 $translator }}?s=24' class="gravatar-24">
+						{{ end }}
+						{{ range $part := $translation.Translation.Parts }}
 							<label class='part'>{{ $part.Translation }}</label>
 						{{ end }}
 					</td>
 					
 					<td class='vote-cell'><span class='btn-group btn-group-xs vote'>
 						{{ if $translations.IsVotable }}
-						<a class='btn btn-xs btn-default vote vote-up {{ if isVotedUp $translation $currentUser }}btn-success active{{ end }}' data-translation=''><span class="glyphicon glyphicon-ok"></span></a>
-						<a class='btn btn-xs btn-default vote vote-down {{ if isVotedDown $translation $currentUser }}btn-danger active{{ end }}' data-translation=''><span class="glyphicon glyphicon-remove"></span></a>
+						<a class='btn btn-xs btn-default vote vote-up {{ if isVotedUp $translation.Translation $currentUser }}btn-success active{{ end }}' data-translation=''><span class="glyphicon glyphicon-ok"></span></a>
+						<a class='btn btn-xs btn-default vote vote-down {{ if isVotedDown $translation.Translation $currentUser }}btn-danger active{{ end }}' data-translation=''><span class="glyphicon glyphicon-remove"></span></a>
 						{{ end }}
 					</span></td>
 				</tr>

@@ -21,10 +21,10 @@ body.users #nav-users a
 }
 
 .gravatar-24 {
-  width: 26px;
-  height: 26px;
-  border-radius: 13px;
-  border: 1px solid white;
+  width: 28px;
+  height: 28px;
+  border-radius: 14px;
+  border: 2px solid white;
 }
 
 .gravatar-32 {
@@ -35,14 +35,14 @@ body.users #nav-users a
 }
 
 .gravatar-64 {
-  width: 68px;
-  height: 68px;
-  border-radius: 34px;
-  border: 2px solid white;
+  width: 70px;
+  height: 70px;
+  border-radius: 35px;
+  border: 3px solid white;
 }
 
 .gravatar-shadow {
-  box-shadow: 1px 3px 6px rgba(0,0,0,0.4);
+  box-shadow: 1px 5px 14px rgba(0,0,30,0.7);
 }
 
 /* Navigation */

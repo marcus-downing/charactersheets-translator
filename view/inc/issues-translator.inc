@@ -17,8 +17,8 @@
 		{{ end }}
 	</table>
 	<div class="panel-footer">
-		<a href='https://github.com/marcusatbang/charactersheets-translator/issues/new'><span class='glyphicon glyphicon-fire'></span>&nbsp; File an issue</a> &nbsp; 
-		<a href='https://github.com/marcusatbang/charactersheets-translator/issues'><span class='glyphicon glyphicon-folder-open'></span>&nbsp; Issues</a>
+		<a href='https://github.com/marcusatbang/charactersheets-translator/issues/new' class='btn btn-danger btn-sm'><span class='glyphicon glyphicon-fire'></span>&nbsp; File an issue</a> &nbsp; 
+		<a href='https://github.com/marcusatbang/charactersheets-translator/issues' class='btn btn-link'><span class='glyphicon glyphicon-folder-open'></span>&nbsp; Issues</a>
 	</div>
 </div>
 
