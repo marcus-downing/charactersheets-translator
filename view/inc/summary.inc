@@ -62,7 +62,7 @@
 	{{ end }}
 
 	<div class="panel-footer">
-		<a class='btn btn-success' href='/translate'><span class="glyphicon glyphicon-globe"></span>&nbsp; Translate</a> &nbsp;
+		<a class='btn btn-success' href='/translate'><span class="glyphicon glyphicon-pencil"></span>&nbsp; Translate</a> &nbsp;
 		<a class='btn btn-link' href='/sources'><span class="glyphicon glyphicon-book"></span>&nbsp; Sources</a>
 		<a class='btn btn-link' href='/entries'><span class="glyphicon glyphicon-certificate"></span>&nbsp; Entries</a>
 	</div>
