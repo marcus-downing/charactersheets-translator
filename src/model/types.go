@@ -125,7 +125,6 @@ func GetEntriesAt(game string, level int, show, search, language string, transla
 	}
 	if show == "conflicts" {
 		sql = sql + " and Translations.IsConflicted = 1"
-		// sql = sql + " and Mine.Translation = Others.Translation"
 	}
 	// if show != "" {
 	// 	sql = sql+" and Translations.Language = ?"
@@ -484,7 +483,7 @@ func (entry *Entry) GetMatchingTranslation(language, translation string) *Transl
 
 func (translation *Translation) HasChanged() bool {
 	underlying := translation.Entry.GetTranslationBy(translation.Language, translation.Translator)
-	return underlying.Translation == translation.Translation
+	return underlying != nil && underlying.Translation == translation.Translation
 }
 
 func (translation *Translation) Save(clearVotes bool) {
@@ -616,6 +615,7 @@ type User struct {
 func parseUser(rows *sql.Rows) (Result, error) {
 	u := User{}
 	err := rows.Scan(&u.Email, &u.Password, &u.Secret, &u.Name, &u.IsAdmin, &u.Language, &u.IsLanguageLead)
+	u.Email = strings.ToLower(u.Email)
 	return u, err
 }
 

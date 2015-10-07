@@ -47,6 +47,17 @@
 		</select>
 	</div>
 
+	{{/*
+	<div class="form-group">
+		<label for='options-sort'>Sort</label>
+		<select id='options-sort' name='sort' class='form-control'>
+			<option value='uses' {{ if eq .CurrentSort "uses" }}selected{{ end }}>Number of uses</option>
+			<option value='pages' {{ if eq .CurrentSort "pages" }}selected{{ end }}>Number of pages</option>
+			<option value='az' {{ if eq .CurrentSort "az" }}selected{{ end }}>Alphabetical (English)</option>
+		</select>
+	</div>
+	*/}}
+
 	{{ pagination .Page }}
 </form>
 
@@ -96,7 +107,7 @@
 {{ $currentUser := .CurrentUser }}
 {{ $lang := .CurrentLanguage }}
 {{ range $i, $entry := .Entries }}
-<tr class='entry {{ entryClass $entry $lang $currentUser }}' data-line='{{ $i }}'>
+<tr class='entry {{ entryClass $entry $lang $currentUser }}' data-line='{{ $i }}' data-entry-id='{{ entryId $entry }}'>
 	<td class='btn-cell'><a class='reveal reveal-sources' data-line='{{ $i }}' data-toggle='modal' data-target='#entry-modal-{{ $i }}' style='cursor: pointer;'>
 		<span class='glyphicon glyphicon-book'></span>&nbsp; <b>{{ len $entry.EntrySources }}</b>
 		<br/><span class='label label-primary'>{{ $entry.Count }}</span>

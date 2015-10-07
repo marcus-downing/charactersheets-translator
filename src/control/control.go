@@ -42,6 +42,7 @@ type TemplateData struct {
 	CurrentLevel       string
 	CurrentShow        string
 	CurrentSearch      string
+	CurrentSort        string
 	NumIssues          int
 	Issues             []Issue
 	NumWebsiteIssues   int
@@ -323,6 +324,10 @@ func profileTranslations(user *model.User) [4]*model.TranslationProfile {
 	return model.ProfileTranslations(user)
 }
 
+func entryId(entry *model.StackedEntry) string {
+	return strconv.FormatUint(entry.ID(), 10)
+}
+
 func entryClass(entry *model.StackedEntry, language string, me *model.User) string {
 	classes := make([]string, 0, 20)
 
@@ -461,6 +466,7 @@ var templateFuncs = template.FuncMap{
 	"countEntryTranslations": countEntryTranslations,
 	"profileTranslations":    profileTranslations,
 	"entryClass":             entryClass,
+	"entryId":                entryId,
 	"pagination":             paginateTemplate,
 	"sourcePath":             sourcePath,
 	"sourceURL":              sourceURL,

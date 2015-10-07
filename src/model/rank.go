@@ -224,7 +224,7 @@ func (se *StackedEntry) MarkConflicts(language string) {
 
 
 func MarkAllConflicts() {
-	stackedEntries := GetStackedEntries("", "", "", "", "", nil)
+	stackedEntries := GetStackedEntries("", "", "", "", "", "", nil)
 	fmt.Println("Loaded", len(stackedEntries), "stacked entries")
 
 	for _, se := range stackedEntries {

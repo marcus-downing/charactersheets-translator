@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"strings"
 	// "time"
+	"golang.org/x/text/collate"
+	"golang.org/x/text/language"
 )
 
 type StackedEntry struct {
@@ -15,6 +17,11 @@ type StackedEntry struct {
 	Entries      []*Entry
 	EntrySources []*EntrySource
 	Count        int
+	SourceCount  int
+}
+
+func (se *StackedEntry) ID() uint64 {
+	return se.Entries[0].ID()
 }
 
 func stackEntries(entries []*Entry) []*StackedEntry {
@@ -33,7 +40,9 @@ func stackEntries(entries []*Entry) []*StackedEntry {
 	}
 
 	// put entries in order
-	fmt.Println("Sorting enties")
+	if Debug >= 1 {
+		fmt.Println("Sorting enties")
+	}
 	values := make([]*StackedEntry, 0, len(stacks)+len(unstacked))
 	for _, stack := range stacks {
 		sort.Sort(entriesByIndex(stack))
@@ -50,14 +59,18 @@ func stackEntries(entries []*Entry) []*StackedEntry {
 	}
 
 	// load sources
-	fmt.Println("Loading sources")
+	if Debug >= 1 {
+		fmt.Println("Loading sources")
+	}
 	sources := make(map[uint64]*Source, 500)
 	for _, source := range GetSources() {
 		sources[source.ID()] = source
 	}
 
 	// calculate totals
-	fmt.Println("Calculating totals")
+	if Debug >= 1 {
+		fmt.Println("Calculating totals")
+	}
 	for _, se := range values {
 		entrySources := make(map[uint64]*EntrySource, len(se.Entries)*10)
 		for _, entry := range se.Entries {
@@ -76,19 +89,34 @@ func stackEntries(entries []*Entry) []*StackedEntry {
 		se.EntrySources = esv
 		se.Count = count
 	}
-	fmt.Println("Final sort")
-	sort.Sort(stacksByName(values))
-	sort.Sort(stacksByCount(values))
 	return values
 }
 
-func GetStackedEntries(game, level, show, search, language string, user *User) []*StackedEntry {
+func sortStacks(values []*StackedEntry, sortBy string) []*StackedEntry {
+	if Debug >= 1 {
+		fmt.Println("Sorting stacks by:", sortBy)
+	}
+	switch sortBy {
+	case "", "uses":
+		// sort.Sort(stacksByName(values))
+		sort.Sort(stacksByCount(values))
+	case "pages":
+		// sort.Sort(stacksByName(values))
+		sort.Sort(stacksBySourceCount(values))
+	case "az":
+		sort.Sort(stacksByName(values))
+	}
+	return values
+}
+
+func GetStackedEntries(game, level, show, search, sortBy, language string, user *User) []*StackedEntry {
 	leveln, err := strconv.Atoi(level)
 	if err != nil || leveln > 4 || leveln < 1 {
 		leveln = 0
 	}
 	entries := GetEntriesAt(game, leveln, show, search, language, user)
-	return stackEntries(entries)
+	stacks := stackEntries(entries)
+	return sortStacks(stacks, sortBy)
 }
 
 func (e *Entry) GetStackedEntry() *StackedEntry {
@@ -151,7 +179,8 @@ func makeStackedTranslation(entry *StackedEntry, parts []*Translation) *StackedT
 		Language:     language,
 		Translator:   translator,
 		Parts:        parts,
-		Count:        len(parts),
+		Count:        len(parts), // ???
+		// SourceCount:  len(sources),
 		FullText:     fullText,
 		IsPreferred:  isPreferred,
 		IsConflicted: isConflicted,
@@ -165,6 +194,7 @@ type StackedTranslation struct {
 	Translator   string
 	Parts        []*Translation
 	Count        int
+	// SourceCount  int
 	FullText     string
 	IsPreferred  bool
 	IsConflicted bool
@@ -229,7 +259,9 @@ func (this stacksByName) Len() int {
 }
 
 func (this stacksByName) Less(i, j int) bool {
-	return this[i].FullText < this[j].FullText
+	collation := collate.New(language.English, collate.Loose)
+	return collation.CompareString(this[i].FullText, this[j].FullText) > 0
+	// return this[i].FullText < this[j].FullText
 }
 
 func (this stacksByName) Swap(i, j int) {
@@ -251,3 +283,18 @@ func (this stacksByCount) Swap(i, j int) {
 	this[i], this[j] = this[j], this[i]
 }
 
+
+// sort stacked entried by number of pages
+type stacksBySourceCount []*StackedEntry
+
+func (this stacksBySourceCount) Len() int {
+	return len(this)
+}
+
+func (this stacksBySourceCount) Less(i, j int) bool {
+	return this[i].SourceCount > this[j].SourceCount
+}
+
+func (this stacksBySourceCount) Swap(i, j int) {
+	this[i], this[j] = this[j], this[i]
+}

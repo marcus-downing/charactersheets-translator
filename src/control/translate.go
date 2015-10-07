@@ -51,7 +51,7 @@ func EntriesHandler(w http.ResponseWriter, r *http.Request) {
 		data.CurrentShow = r.FormValue("show")
 		data.CurrentSearch = r.FormValue("search")
 
-		data.Entries = model.GetStackedEntries(data.CurrentGame, data.CurrentLevel, data.CurrentShow, data.CurrentSearch, "gb", currentUser)
+		data.Entries = model.GetStackedEntries(data.CurrentGame, data.CurrentLevel, data.CurrentShow, data.CurrentSearch, "uses", "gb", currentUser)
 		data.Page = Paginate(r, PageSize, len(data.Entries))
 		data.Entries = data.Entries[data.Page.Offset:data.Page.Slice]
 		return data
@@ -70,10 +70,14 @@ func TranslationHandler(w http.ResponseWriter, r *http.Request) {
 		data.CurrentLevel = r.FormValue("level")
 		data.CurrentShow = r.FormValue("show")
 		data.CurrentSearch = r.FormValue("search")
+		data.CurrentSort = r.FormValue("sort")
+		if data.CurrentSort == "" {
+			data.CurrentSort = "uses"
+		}
 		if data.CurrentSearch != "" {
 			fmt.Println("Searching for:", data.CurrentSearch)
 		}
-		data.Entries = model.GetStackedEntries(data.CurrentGame, data.CurrentLevel, data.CurrentShow, data.CurrentSearch, data.CurrentLanguage, currentUser)
+		data.Entries = model.GetStackedEntries(data.CurrentGame, data.CurrentLevel, data.CurrentShow, data.CurrentSearch, data.CurrentSort, data.CurrentLanguage, currentUser)
 
 		data.Page = Paginate(r, PageSize, len(data.Entries))
 		data.Entries = data.Entries[data.Page.Offset:data.Page.Slice]
