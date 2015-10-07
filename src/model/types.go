@@ -116,6 +116,9 @@ func GetEntriesAt(game string, level int, show, search, language string, transla
 	sql = sql + " where 1 = 1"
 
 	if game != "" {
+		if game == "dnd35" {
+			game = "3.5"
+		}
 		sql = sql + " and Game = ?"
 		args = append(args, game)
 	}
@@ -242,6 +245,9 @@ func GetSourcesAt(game string, level int, show string) []*Source {
 	sql = sql + " where 1 = 1"
 
 	if game != "" {
+		if game == "dnd35" {
+			game = "3.5"
+		}
 		sql = sql + " and Game = ?"
 		args = append(args, game)
 	}
