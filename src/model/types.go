@@ -84,6 +84,11 @@ func GetEntries() []*Entry {
 	return makeEntries(results)
 }
 
+func GetEntriesPartOf(partOf string) []*Entry {
+	results := query("select " + entryFields + " from Entries where Partof = ?", partOf).rows(parseEntry)
+	return makeEntries(results)
+}
+
 func GetEntriesAt(game string, level int, show, search, language string, translator *User) []*Entry {
 	if game == "" && level == 0 && show == "" && search == "" {
 		return GetEntries()

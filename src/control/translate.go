@@ -6,6 +6,7 @@ import (
 	// "crypto/md5"
 	// "encoding/hex"
 	// "html/template"
+	"math"
 	// "math/rand"
 	"encoding/csv"
 	// "io"
@@ -20,7 +21,7 @@ import (
 )
 
 const (
-	PageSize = 20
+	PageSize = 50
 )
 
 func SourcesHandler(w http.ResponseWriter, r *http.Request) {
@@ -85,9 +86,34 @@ func TranslationHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func importMasterData(data []map[string]string) {
+var CurrentProgress map[int]*TaskProgress
+var nextProgressID chan int
+
+func init() {
+	CurrentProgress = make(map[int]*TaskProgress)
+	nextProgressID = make(chan int)
+	go func () {
+		i := 1
+		for {
+			i++
+			nextProgressID <- i
+		}
+	}()
+}
+
+type TaskProgress struct {
+	ID       int
+	Progress int
+	Scale    int
+	Finished bool
+	Abort    bool
+}
+
+func importMasterData(data []map[string]string, progress *TaskProgress) {
 	sleepTime, _ := time.ParseDuration("5ms")
 	fmt.Println("Importing", len(data), "master records")
+	progress.Scale = len(data)
+	progress.Progress = 0
 	for _, record := range data {
 		if model.Debug >= 2 {
 			fmt.Println("Inserting translation:", record["Original"], ";", record["Part of"])
@@ -120,20 +146,23 @@ func importMasterData(data []map[string]string) {
 		}
 		entrySource.Save()
 		time.Sleep(sleepTime)
+		progress.Progress++
 	}
-	fmt.Println("Import complete")
+	fmt.Println("Import complete. Imported", progress.Progress, "master records")
 
 	model.MarkAllConflicts()
 	fmt.Println("Conflicts marked")
 }
 
-func importTranslationData(data []map[string]string, language string, translator *model.User) {
+func importTranslationData(data []map[string]string, language string, translator *model.User, progress *TaskProgress) {
 	sleepTime, _ := time.ParseDuration("5ms")
 	fmt.Println("Importing", len(data), "translation records as", translator.Name)
-	num := 0
+	progress.Scale = len(data)
+	progress.Progress = 0
 	for _, record := range data {
 		t := record["Translation"]
 		if t == "" {
+			progress.Scale--
 			continue
 		}
 		translation := &model.Translation{
@@ -147,9 +176,9 @@ func importTranslationData(data []map[string]string, language string, translator
 		}
 		translation.Save(true)
 		time.Sleep(sleepTime)
-		num++
+		progress.Progress++
 	}
-	fmt.Println("Import complete:", num, "of", len(data))
+	fmt.Println("Import complete:", progress.Progress, "of", len(data))
 	
 	model.MarkAllConflicts()
 	fmt.Println("Conflicts marked")
@@ -188,15 +217,19 @@ func ImportHandler(w http.ResponseWriter, r *http.Request) {
 		data := associateData(lines)
 		fmt.Println("Found", len(data), "lines")
 
+		progress := new(TaskProgress)
+		progress.ID = <- nextProgressID
+		CurrentProgress[progress.ID] = progress
+
 		if importType == "master" {
-			go importMasterData(data)
+			go importMasterData(data, progress)
 		} else {
 			language := r.FormValue("language")
 			translator := model.GetUserByEmail(r.FormValue("translator"))
-			go importTranslationData(data, language, translator)
+			go importTranslationData(data, language, translator, progress)
 		}
 
-		http.Redirect(w, r, "/import/done", 303)
+		http.Redirect(w, r, "/import/progress?id="+strconv.Itoa(progress.ID), 303)
 	} else {
 		renderTemplate("import", w, r, func(data TemplateData) TemplateData {
 			data.Users = model.GetUsers()
@@ -205,10 +238,29 @@ func ImportHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func ImportDoneHandler(w http.ResponseWriter, r *http.Request) {
-	renderTemplate("import_done", w, r, func(data TemplateData) TemplateData {
+func ImportProgressHandler(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(r.FormValue("id"))
+	progress, ok := CurrentProgress[id]
+	if ok && progress.Finished {
+		http.Redirect(w, r, "/import", 303)
+	}
+	
+	renderTemplate("import_progress", w, r, func(data TemplateData) TemplateData {
+		if ok {
+			percent := float64(progress.Progress) * 100 / float64(progress.Scale)
+			data.ProgressPercent = int(math.Floor(percent))
+			data.ProgressID = progress.ID
+		}
 		return data
 	})
+}
+
+func ImportAbortHandler(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(r.FormValue("id"))
+	if progress, ok := CurrentProgress[id]; ok {
+		progress.Abort = true
+	}
+	http.Redirect(w, r, "/import", 303)
 }
 
 func ExportHandler(w http.ResponseWriter, r *http.Request) {

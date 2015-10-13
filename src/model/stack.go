@@ -40,9 +40,9 @@ func stackEntries(entries []*Entry) []*StackedEntry {
 	}
 
 	// put entries in order
-	if Debug >= 1 {
-		fmt.Println("Sorting enties")
-	}
+	// if Debug >= 1 {
+	// 	fmt.Println("Sorting entries")
+	// }
 	values := make([]*StackedEntry, 0, len(stacks)+len(unstacked))
 	for _, stack := range stacks {
 		sort.Sort(entriesByIndex(stack))
@@ -115,8 +115,32 @@ func GetStackedEntries(game, level, show, search, sortBy, language string, user 
 		leveln = 0
 	}
 	entries := GetEntriesAt(game, leveln, show, search, language, user)
+	if search != "" {
+		// searching can result in getting only part of a stack
+		// make sure we have *all* of each stack
+		entries = RefillEntries(entries)
+	}
 	stacks := stackEntries(entries)
 	return sortStacks(stacks, sortBy)
+}
+
+func RefillEntries(entries []*Entry) []*Entry {
+	alreadyLoaded := make(map[string]struct{}, len(entries))
+	refilled := make([]*Entry, 0, len(entries) * 2)
+	for _, entry := range entries {
+		if entry.PartOf != "" && entry.Original != entry.PartOf {
+			if _, loaded := alreadyLoaded[entry.PartOf]; !loaded {
+				parts := GetEntriesPartOf(entry.PartOf)
+				for _, part := range parts {
+					refilled = append(refilled, part)
+				}
+				alreadyLoaded[entry.PartOf] = struct{}{}
+			}
+		} else {
+			refilled = append(refilled, entry)
+		}
+	}
+	return refilled
 }
 
 func (e *Entry) GetStackedEntry() *StackedEntry {

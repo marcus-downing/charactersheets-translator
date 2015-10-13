@@ -43,12 +43,15 @@ type TemplateData struct {
 	CurrentShow        string
 	CurrentSearch      string
 	CurrentSort        string
-	NumIssues          int
-	Issues             []Issue
-	NumWebsiteIssues   int
-	WebsiteIssues      []Issue
-	NumTranslatorIssues   int
-	TranslatorIssues      []Issue
+	ProgressPercent    int
+	ProgressID         int
+
+	NumIssues           int
+	Issues              []Issue
+	NumWebsiteIssues    int
+	WebsiteIssues       []Issue
+	NumTranslatorIssues int
+	TranslatorIssues    []Issue
 }
 
 type Pagination struct {

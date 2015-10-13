@@ -1,0 +1,40 @@
+{{ define "title" }}Import Progress{{ end }}
+
+{{ define "content" }}
+
+<div class='container'>
+<h1>&nbsp;</h1>
+
+<div class='panel panel-info'>
+	<div class="panel-heading"><h3 class="panel-title"><span class="glyphicon glyphicon-cloud-upload"></span>&nbsp; Import processing</h3></div>
+	<div class="panel-body">
+		<p>The import is being processed in the background.</p>
+
+		<div class="progress active">
+			<div class="progress-bar"  role="progressbar" aria-valuenow="{{ .ProgressPercent }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ .ProgressPercent }}%">
+				<span class="sr-only--not">{{ .ProgressPercent }}%</span>
+			</div>
+		</div>
+	</div>
+
+	<div class="panel-footer">
+		<a href='/import/abort?id={{ .ProgressID }}' class='btn btn-danger'><span class="glyphicon glyphicon-remove"></span> Abort</a> &nbsp;
+		<a href='/home' class='btn btn-link'><span class="glyphicon glyphicon-home"></span> Home</a> &nbsp;
+		<a href='/entries' class='btn btn-link'><span class="glyphicon glyphicon-record"></span> Entries</a> &nbsp;
+		<a href='/sources' class='btn btn-link'><span class="glyphicon glyphicon-record"></span> Sources</a> &nbsp;
+		<a href='/translate' class='btn btn-link'><span class="glyphicon glyphicon-globe"></span> Translate</a>
+	</div>
+</div>
+
+<script>
+
+$(function () {
+	setTimeout(function () {
+		location.reload();
+	}, 5000);
+});
+
+</script>
+
+</div>{{/* container */}}
+{{ end }}
