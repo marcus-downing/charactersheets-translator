@@ -48,6 +48,15 @@ func (entry *Entry) ID() uint64 {
 	return hash64(str)
 }
 
+func DeleteAllEntries() {
+	if Debug >= 2 {
+		fmt.Println("Deleting ALL entries")
+	}
+	query("delete from entries").exec()
+	query("delete from sources").exec()
+	query("delete from entrysources").exec()
+}
+
 const entryFields = "Original, PartOf"
 
 func parseEntry(rows *sql.Rows) (Result, error) {

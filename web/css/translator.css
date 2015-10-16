@@ -335,7 +335,7 @@ label.part:last-child {
 }
 
 td.translate-2-parts input {
-  width: 50% !important;
+  width: 49.8% !important;
 }
 
 td.translate-3-parts input {
@@ -343,11 +343,35 @@ td.translate-3-parts input {
 }
 
 td.translate-4-parts input {
-  width: 25% !important;
+  width: 24.65% !important;
 }
 
 td.translate-5-parts input {
-  width: 20% !important;
+  width: 19.65% !important;
+}
+
+td.translate-6-parts input {
+  width: 16.5% !important;
+}
+
+td.translate-7-parts input {
+  width: 13.91% !important;
+}
+
+td.translate-8-parts input {
+  width: 12.4% !important;
+}
+
+td.translate-9-parts input {
+  width: 11% !important;
+}
+
+td.translate-10-parts input {
+  width: 10% !important;
+}
+
+td.translate-11-parts input {
+  width: 8.7% !important;
 }
 
 td.btn-cell {

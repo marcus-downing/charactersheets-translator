@@ -7,10 +7,19 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"regexp"
 	// "time"
 	"golang.org/x/text/collate"
 	"golang.org/x/text/language"
 )
+
+var simplifyNameRegex *regexp.Regexp
+var collation *collate.Collator
+
+func init () {
+	simplifyNameRegex = regexp.MustCompile("[^a-zA-Z0-9]")
+	collation = collate.New(language.English, collate.Loose, collate.IgnoreCase, collate.Numeric)
+}
 
 type StackedEntry struct {
 	FullText     string
@@ -88,6 +97,7 @@ func stackEntries(entries []*Entry) []*StackedEntry {
 		}
 		se.EntrySources = esv
 		se.Count = count
+		se.SourceCount = len(entrySources)
 	}
 	return values
 }
@@ -204,7 +214,6 @@ func makeStackedTranslation(entry *StackedEntry, parts []*Translation) *StackedT
 		Translator:   translator,
 		Parts:        parts,
 		Count:        len(parts), // ???
-		// SourceCount:  len(sources),
 		FullText:     fullText,
 		IsPreferred:  isPreferred,
 		IsConflicted: isConflicted,
@@ -218,7 +227,6 @@ type StackedTranslation struct {
 	Translator   string
 	Parts        []*Translation
 	Count        int
-	// SourceCount  int
 	FullText     string
 	IsPreferred  bool
 	IsConflicted bool
@@ -283,9 +291,9 @@ func (this stacksByName) Len() int {
 }
 
 func (this stacksByName) Less(i, j int) bool {
-	collation := collate.New(language.English, collate.Loose)
-	return collation.CompareString(this[i].FullText, this[j].FullText) > 0
-	// return this[i].FullText < this[j].FullText
+	left := simplifyNameRegex.ReplaceAllString(this[i].FullText, "")
+	right := simplifyNameRegex.ReplaceAllString(this[j].FullText, "")
+	return collation.CompareString(left, right) < 0
 }
 
 func (this stacksByName) Swap(i, j int) {

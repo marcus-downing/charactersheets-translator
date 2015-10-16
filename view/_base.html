@@ -37,15 +37,15 @@
     </div>-->
     <div class="collapse navbar-collapse" id="navbar-collapse">
       <ul class="nav navbar-nav">
-        <li id='nav-home'><a href="/home"><span class="glyphicon glyphicon-home"></span> Home</a></li>
-        <li id='nav-sources'><a href="/sources"><span class="glyphicon glyphicon-book"></span> Sources</a></li>
-        <li id='nav-entries'><a href="/entries"><span class="glyphicon glyphicon-certificate"></span> Entries</a></li>
-        <li id='nav-translate'><a href="/translate"><span class="glyphicon glyphicon-pencil"></span> Translate</a></li>
+        <li id='nav-home'><a href="/home"><span class="glyphicon glyphicon-home"></span>&nbsp; Home</a></li>
+        <li id='nav-sources'><a href="/sources"><span class="glyphicon glyphicon-book"></span>&nbsp; Sources</a></li>
+        <li id='nav-entries'><a href="/entries"><span class="glyphicon glyphicon-certificate"></span>&nbsp; Entries</a></li>
+        <li id='nav-translate'><a href="/translate"><span class="glyphicon glyphicon-pencil"></span>&nbsp; Translate</a></li>
         {{ if .IsAdmin }}
-        <li id='nav-import'><a href="/import"><span class="glyphicon glyphicon-cloud-upload"></span> Import</a></li>
-        <li id='nav-export'><a href="/export"><span class="glyphicon glyphicon-cloud-download"></span> Export</a></li>
+        <li id='nav-import'><a href="/import"><span class="glyphicon glyphicon-cloud-upload"></span>&nbsp; Import</a></li>
+        <li id='nav-export'><a href="/export"><span class="glyphicon glyphicon-cloud-download"></span>&nbsp; Export</a></li>
         {{ end }}
-        <li id='nav-users'><a href="/users"><span class="glyphicon glyphicon-user"></span> Users</a></li>
+        <li id='nav-users'><a href="/users"><span class="glyphicon glyphicon-user"></span>&nbsp; Users</a></li>
       </ul>
       <p class="navbar-text navbar-right visible-md visible-lg">Signed in as &nbsp; <img src='http://www.gravatar.com/avatar/{{ md5 .CurrentUser.Email }}?s=24' class="gravatar-24">&nbsp; {{ .CurrentUser.Name }}</p>
     </div><!--/.nav-collapse -->
@@ -54,10 +54,6 @@
 
 <div id="body">
 {{ template "content" . }}
-</div>
-
-<div id='footer'>
-&nbsp;
 </div>
 
 <script src="/bootstrap/js/bootstrap.min.js"></script>

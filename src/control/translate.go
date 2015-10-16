@@ -109,12 +109,24 @@ type TaskProgress struct {
 	Abort    bool
 }
 
-func importMasterData(data []map[string]string, progress *TaskProgress) {
+func importMasterData(data []map[string]string, clean bool, progress *TaskProgress) {
 	sleepTime, _ := time.ParseDuration("5ms")
 	fmt.Println("Importing", len(data), "master records")
 	progress.Scale = len(data)
 	progress.Progress = 0
+
+	if clean {
+		if model.Debug >= 1 {
+			fmt.Println("Clean import")
+		}
+		model.DeleteAllEntries()
+	}
+
 	for _, record := range data {
+		if progress.Abort {
+			fmt.Println("Import aborted")
+			return
+		}
 		if model.Debug >= 2 {
 			fmt.Println("Inserting translation:", record["Original"], ";", record["Part of"])
 		}
@@ -222,7 +234,8 @@ func ImportHandler(w http.ResponseWriter, r *http.Request) {
 		CurrentProgress[progress.ID] = progress
 
 		if importType == "master" {
-			go importMasterData(data, progress)
+			clean := r.FormValue("clean") == "on"
+			go importMasterData(data, clean, progress)
 		} else {
 			language := r.FormValue("language")
 			translator := model.GetUserByEmail(r.FormValue("translator"))
