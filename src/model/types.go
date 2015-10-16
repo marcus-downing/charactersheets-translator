@@ -50,11 +50,20 @@ func (entry *Entry) ID() uint64 {
 
 func DeleteAllEntries() {
 	if Debug >= 2 {
-		fmt.Println("Deleting ALL entries")
+		fmt.Println(" ***** Deleting ALL entries")
 	}
-	query("delete from entries").exec()
-	query("delete from sources").exec()
-	query("delete from entrysources").exec()
+	if ok := query("delete from Entries").exec(); !ok {
+		fmt.Println(" ***** Error deleting entries")
+	}
+	if ok := query("delete from Sources").exec(); !ok {
+		fmt.Println(" ***** Error deleting sources")
+	}
+	if ok := query("delete from EntrySources").exec(); !ok {
+		fmt.Println(" ***** Error deleting entrysources")
+	}
+	if Debug >= 2 {
+		fmt.Println(" ***** Deleted ALL entries")
+	}
 }
 
 const entryFields = "Original, PartOf"
