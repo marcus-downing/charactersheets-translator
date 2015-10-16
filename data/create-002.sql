@@ -6,6 +6,11 @@
 #  Timestamp = 4 bytes -> 2 characters
 #  Language = 2 characters
 
+CREATE DATABASE chartrans2
+DEFAULT CHARACTER SET utf8
+DEFAULT COLLATE utf8_general_ci;
+
+use chartrans2;
 
 create table Entries (
 EntryID bigint unique not null,
