@@ -60,8 +60,8 @@ func GetLanguageCompletion() map[string][4]int {
 	var completion = make(map[string][4]int, len(Languages))
 	var totals [4]int
 	for i := 1; i <= 4; i++ {
-		totals[i-1] = query("select count(distinct Original, PartOf) from Entries "+
-			"inner join EntrySources on Entries.EntryID = EntrySources.EntryID "+
+		totals[i-1] = query("select sum(EntrySources.Count) from EntrySources "+
+			"inner join Entries on Entries.EntryID = EntrySources.EntryID "+
 			"inner join Sources on Sources.SourceID = EntrySources.SourceID "+
 			"where Sources.Level = ?", i).count()
 	}
@@ -72,10 +72,11 @@ func GetLanguageCompletion() map[string][4]int {
 		} else {
 			var values [4]int
 			for i := 1; i <= 4; i++ {
-				count := query("select count(distinct Translations.EntryID) from Translations "+
-					"inner join EntrySources on Translations.EntryID = EntrySources.EntryID "+
+				count := query("select sum(EntrySources.Count) from EntrySources "+
+					"inner join Entries on Entries.EntryID = EntrySources.EntryID "+
 					"inner join Sources on Sources.SourceID = EntrySources.SourceID "+
-					"where Sources.Level = ? and Language = ?", i, lang).count()
+					"where Sources.Level = ? and Entries.EntryID in "+
+					"(select EntryID from Translations where Language = ?)", i, lang).count()
 				if totals[i-1] > 0 {
 					values[i-1] = 100 * count / totals[i-1]
 				}
