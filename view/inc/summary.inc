@@ -32,7 +32,7 @@
 							<span class="sr-only">{{ $profile.ByMeAndOthersNoConflictPercent }}% complete by me and others</span>
 						</div>
 						<div class="progress-bar progress-bar-danger" style="width: {{ $profile.ByMeAndOthersConflictPercent }}%">
-							<span class="sr-only">{{ $profile.ByMeAndOthersConflictPercent }}% conflicts</span>
+							<span class="sr-only">{{ $profile.AnyConflictPercent }}% conflicts</span>
 						</div>
 					</div>
 					<p class='lang-counts'>
@@ -53,7 +53,7 @@
 						{{ end }}
 						{{ if $profile.ByMeAndOthersConflict }}
 							<a class='lang-count lang-count-conflict' href='/translate?level={{ $profile.Level }}&amp;show=conflicts'>
-								<span class='badge'>{{ $profile.ByMeAndOthersConflict }}</span> conflicts
+								<span class='badge'>{{ $profile.AnyConflict }}</span> conflicts
 							</a>
 						{{ end }}
 					</p>

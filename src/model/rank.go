@@ -213,7 +213,7 @@ func (entry *StackedEntry) RankTranslations(translations []*StackedTranslation, 
 
 func (se *StackedEntry) MarkConflicts(language string) {
 	if Debug >= 1 {
-		fmt.Println("Marking conflicts in '"+se.FullText+"'")
+		fmt.Println("Marking conflicts in '"+se.FullText+"' ("+language+")")
 	}
 	translations := se.GetTranslations(language)
 	if Debug >= 1 {

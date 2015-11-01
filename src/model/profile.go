@@ -19,6 +19,7 @@ type TranslationProfile struct {
 	ByMeAndOthers           int
 	ByMeAndOthersNoConflict int
 	ByMeAndOthersConflict   int
+	AnyConflict             int
 	ByNobody                int
 
 	CompletedPercent               float64
@@ -30,6 +31,7 @@ type TranslationProfile struct {
 	ByMeAndOthersPercent           float64
 	ByMeAndOthersNoConflictPercent float64
 	ByMeAndOthersConflictPercent   float64
+	AnyConflictPercent             float64
 	ByNobodyPercent                float64
 }
 
@@ -98,7 +100,15 @@ func ProfileTranslations(user *User) [4]*TranslationProfile {
 			"where A.Language = ? and A.IsConflicted = 1 "+
 			"group by A.EntryID"+
 			") as qs", level, lang).count()
-		fmt.Println(" -- conflicting =", conflict)
+
+		myconflict := query("select count(*) from (select A.EntryID from Translations A "+
+			"inner join EntrySources on A.EntryID = EntrySources.EntryID "+
+			"inner join Sources on Sources.SourceID = EntrySources.SourceID and Sources.Level = ? "+
+			"where A.Language = ? and A.IsConflicted = 1 and A.Translator = ? "+
+			"group by A.EntryID"+
+			") as qs", level, lang, user.Email).count()
+
+		fmt.Println(" -- conflicting =", conflict, " by me =", myconflict)
 
 		total64 := float64(total) + 0.0001
 		completed64 := float64(completed) + 0.0001
@@ -116,8 +126,9 @@ func ProfileTranslations(user *User) [4]*TranslationProfile {
 			ByOthers:                byothers,
 			ByOthersAlone:           byothers - byboth,
 			ByMeAndOthers:           byboth,
-			ByMeAndOthersNoConflict: byboth - conflict,
-			ByMeAndOthersConflict:   conflict,
+			ByMeAndOthersNoConflict: byboth - myconflict,
+			ByMeAndOthersConflict:   myconflict,
+			AnyConflict:             conflict,
 			ByNobody:                total - (byme + byothers - byboth),
 
 			CompletedPercent:               roundPercent(float64(completed) / total64),
@@ -125,8 +136,9 @@ func ProfileTranslations(user *User) [4]*TranslationProfile {
 			ByMePercent:                    roundPercent(float64(byme-byboth) / completed64),
 			ByOthersPercent:                roundPercent(float64(byothers-byboth) / completed64),
 			ByMeAndOthersPercent:           roundPercent(float64(byboth) / completed64),
-			ByMeAndOthersNoConflictPercent: roundPercent(float64(byboth-conflict) / completed64),
-			ByMeAndOthersConflictPercent:   roundPercent(float64(conflict) / completed64),
+			ByMeAndOthersNoConflictPercent: roundPercent(float64(byboth-myconflict) / completed64),
+			ByMeAndOthersConflictPercent:   roundPercent(float64(myconflict) / completed64),
+			AnyConflictPercent:             roundPercent(float64(conflict) / completed64),
 			ByNobodyPercent:                roundPercent(float64(total-(byme+byothers-byboth)) / completed64),
 		}
 		fmt.Println(" -- profile =", profile)
