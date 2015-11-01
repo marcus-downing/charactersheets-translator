@@ -25,7 +25,7 @@
 			<td>
 				<div class="progress">
 				  <div class="progress-bar progress-bar-{{$col}}" role="progressbar" aria-valuenow="{{$complete}}" aria-valuemin="0" aria-valuemax="100" style="width: {{$complete}}%;">
-				    <span class="sr-only" data-toggle="tooltip" data-placement="bottom" title="{{$complete}}% complete">{{$complete}}% complete</span>
+				    <span class="" data-toggle="tooltip" data-placement="bottom" title="{{$complete}}% complete">{{$complete}}% complete</span>
 				  </div>
 				</div>
 			</td>

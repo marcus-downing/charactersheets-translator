@@ -21,6 +21,20 @@
 					<div class='progress-bar progress-bar' style='width: {{ $profile.CompletedPercent }}%'>
 					</div>
 					</div>
+					<div class="progress">
+						<div class="progress-bar progress-bar-success" style="width: {{ $profile.ByMePercent }}%">
+							<span class="sr-only">{{ $profile.ByMePercent }}% completed by me</span>
+						</div>
+						<div class="progress-bar progress-bar-info" style="width: {{ $profile.ByOthersPercent }}%">
+							<span class="sr-only">{{ $profile.ByOthersPercent }}% completed by others</span>
+						</div>
+						<div class="progress-bar progress-bar-warning" style="width: {{ $profile.ByMeAndOthersNoConflictPercent }}%">
+							<span class="sr-only">{{ $profile.ByMeAndOthersNoConflictPercent }}% complete by me and others</span>
+						</div>
+						<div class="progress-bar progress-bar-danger" style="width: {{ $profile.ByMeAndOthersConflictPercent }}%">
+							<span class="sr-only">{{ $profile.ByMeAndOthersConflictPercent }}% conflicts</span>
+						</div>
+					</div>
 					<p class='lang-counts'>
 						{{ if $profile.ByMeAlone }}
 							<a class='lang-count lang-count-mine' href='/translate?level={{ $profile.Level }}&amp;show=mine'>
@@ -43,20 +57,6 @@
 							</a>
 						{{ end }}
 					</p>
-					<div class="progress">
-						<div class="progress-bar progress-bar-success" style="width: {{ $profile.ByMePercent }}%">
-							<span class="sr-only">{{ $profile.ByMePercent }}% completed by me</span>
-						</div>
-						<div class="progress-bar progress-bar-info" style="width: {{ $profile.ByOthersPercent }}%">
-							<span class="sr-only">{{ $profile.ByOthersPercent }}% completed by others</span>
-						</div>
-						<div class="progress-bar progress-bar-warning" style="width: {{ $profile.ByMeAndOthersNoConflictPercent }}%">
-							<span class="sr-only">{{ $profile.ByMeAndOthersNoConflictPercent }}% complete by me and others</span>
-						</div>
-						<div class="progress-bar progress-bar-danger" style="width: {{ $profile.ByMeAndOthersConflictPercent }}%">
-							<span class="sr-only">{{ $profile.ByMeAndOthersConflictPercent }}% conflicts</span>
-						</div>
-					</div>
 				</div>
 		</div>
 	{{ end }}
