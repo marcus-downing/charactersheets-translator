@@ -23,6 +23,7 @@ type Configuration struct {
 	Database    databaseConfig `toml:"db"`
 	OldDatabase databaseConfig `toml:"old_db"`
 	Github      githubConfig   `toml:"github"`
+	Partial		bool           `toml:"partial"`
 }
 
 type serverConfig struct {

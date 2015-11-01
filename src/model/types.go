@@ -48,13 +48,13 @@ func (entry *Entry) ID() uint64 {
 	return hash64(str)
 }
 
-func DeleteAllEntries() {
+func DeleteAllEntrySources() {
 	if Debug >= 2 {
-		fmt.Println(" ***** Deleting ALL entries")
+		fmt.Println(" ***** Deleting ALL entry sources")
 	}
-	if ok := query("delete from Entries").exec(); !ok {
-		fmt.Println(" ***** Error deleting entries")
-	}
+	// if ok := query("delete from Entries").exec(); !ok {
+	// 	fmt.Println(" ***** Error deleting entries")
+	// }
 	if ok := query("delete from Sources").exec(); !ok {
 		fmt.Println(" ***** Error deleting sources")
 	}
@@ -62,7 +62,7 @@ func DeleteAllEntries() {
 		fmt.Println(" ***** Error deleting entrysources")
 	}
 	if Debug >= 2 {
-		fmt.Println(" ***** Deleted ALL entries")
+		fmt.Println(" ***** Deleted ALL entry sources")
 	}
 }
 

@@ -161,7 +161,7 @@ func (query Query) row(f func(*sql.Rows) (Result, error)) Result {
 	return nil
 }
 
-func recordExists(table string, keyfields map[string]interface{}) bool {
+func RecordExists(table string, keyfields map[string]interface{}) bool {
 	conditions := make([]string, 0, len(keyfields))
 	args := make([]interface{}, 0, len(keyfields))
 	for key, value := range keyfields {
@@ -180,7 +180,7 @@ func saveRecord(table string, keyfields, fields map[string]interface{}) bool {
 		fmt.Println("Saving record")
 	}
 
-	update := recordExists(table, keyfields)
+	update := RecordExists(table, keyfields)
 
 	var sql string
 	args := make([]interface{}, 0, len(keyfields)+len(fields))

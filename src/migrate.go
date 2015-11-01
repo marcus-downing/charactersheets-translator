@@ -10,7 +10,7 @@ import (
 
 func main() {
 	dbname1 := config.Config.OldDatabase.Database
-	// dbname2 := config.Config.Database.Database
+	dbname2 := config.Config.Database.Database
 	// dbname1 := "chartrans"
 	// dbname2 := "chartrans2"
 	// dbuser := "chartrans"
@@ -28,14 +28,16 @@ func main() {
 	}
 
 	// clear out
-	fmt.Print("Clearing out old data... ")
-	_, _ = db2.Exec("delete from Entries")
-	_, _ = db2.Exec("delete from Sources")
-	_, _ = db2.Exec("delete from EntrySources")
-	_, _ = db2.Exec("delete from Translations")
-	_, _ = db2.Exec("delete from Users")
-	_, _ = db2.Exec("delete from Votes")
-	fmt.Println("done.")
+	if !config.Config.Partial {
+		fmt.Print("Clearing out old data... ")
+		_, _ = db2.Exec("delete from Entries")
+		_, _ = db2.Exec("delete from Sources")
+		_, _ = db2.Exec("delete from EntrySources")
+		_, _ = db2.Exec("delete from Translations")
+		_, _ = db2.Exec("delete from Users")
+		_, _ = db2.Exec("delete from Votes")
+		fmt.Println("done.")
+	}
 
 	// entries
 	fmt.Print("Entries... ")
@@ -49,6 +51,12 @@ func main() {
 			err = rows.Scan(&entry.Original, &entry.PartOf)
 			if err != nil {
 				fmt.Println("Error reading entry:", err)
+				continue
+			}
+
+			if config.Config.Partial && model.RecordExists("Entries", map[string]interface{}{
+				"EntryID": entry.ID(),
+			}) {
 				continue
 			}
 
@@ -76,6 +84,12 @@ func main() {
 			err = rows.Scan(&source.Filepath, &source.Page, &source.Volume, &source.Level, &source.Game)
 			if err != nil {
 				fmt.Println("Error reading srouce:", err)
+				continue
+			}
+
+			if config.Config.Partial && model.RecordExists("Sources", map[string]interface{}{
+				"SourceID": source.ID(),
+			}) {
 				continue
 			}
 
@@ -110,6 +124,14 @@ func main() {
 			if err != nil {
 				fmt.Println("Error reading source line:", err)
 			}
+
+			if config.Config.Partial && model.RecordExists("EntrySources", map[string]interface{}{
+				"EntryID": es.Entry.ID(),
+				"SourceID": es.Source.ID(),
+			}) {
+				continue
+			}
+
 			_, err = db2.Exec("insert into EntrySources(EntryID, SourceID, Count) values (?,?,?)", es.Entry.ID(), es.Source.ID(), es.Count)
 			if err != nil {
 				fmt.Println("Error writing source line:", err)
@@ -135,8 +157,15 @@ func main() {
 				fmt.Println("Error reading translation:", err)
 				continue
 			}
+
 			if translation.Entry.Original == "(Round down)" && translation.Language == "pl" {
 				fmt.Println(" *** Transferring: (Round down) =", translation.Translation)
+			}
+
+			if config.Config.Partial && model.RecordExists("Translations", map[string]interface{}{
+				"TranslationID": translation.ID(),
+			}) {
+				continue
 			}
 
 			_, err = db2.Exec("insert into Translations(TranslationID, EntryID, Language, Translator, Translation, IsPreferred, IsConflicted) values (?,?,?,?,?,?,?)",
@@ -149,7 +178,7 @@ func main() {
 
 	// users
 	fmt.Print("Users... ")
-	result, err := db2.Exec("insert into Users (Email, Password, Secret, Name, IsAdmin, Language, IsLanguageLead) select Email, Password, Secret, Name, IsAdmin, Language, IsLanguageLead from " + dbname1 + ".Users")
+	result, err := db2.Exec("insert into Users (Email, Password, Secret, Name, IsAdmin, Language, IsLanguageLead) select Email, Password, Secret, Name, IsAdmin, Language, IsLanguageLead from " + dbname1 + ".Users where Email not in (select Email from " + dbname2 + ".Users)")
 	if err != nil {
 		fmt.Println("Error transferring users:", err)
 	} else {
@@ -172,6 +201,15 @@ func main() {
 				fmt.Println("Error reading vote:", err)
 				continue
 			}
+
+
+			if config.Config.Partial && model.RecordExists("Votes", map[string]interface{}{
+				"TranslationID": vote.Translation.ID(),
+				"Voter": voter,
+			}) {
+				continue
+			}
+
 			_, err = db2.Exec("insert into Votes (TranslationID, Voter, Vote) values (?,?,?)", vote.Translation.ID(), voter, vote.Vote)
 			if err != nil {
 				fmt.Println("Error writing vote:", err)

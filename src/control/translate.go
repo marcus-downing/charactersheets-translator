@@ -119,7 +119,7 @@ func importMasterData(data []map[string]string, clean bool, progress *TaskProgre
 		if model.Debug >= 1 {
 			fmt.Println("Clean import")
 		}
-		model.DeleteAllEntries()
+		model.DeleteAllEntrySources()
 	}
 
 	for _, record := range data {
