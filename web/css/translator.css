@@ -42,7 +42,7 @@ body.users #nav-users a
 }
 
 .gravatar-shadow {
-  box-shadow: 1px 5px 14px rgba(0,0,30,0.7);
+  /*box-shadow: 1px 5px 14px rgba(0,0,30,0.7);*/
 }
 
 /* Navigation */
