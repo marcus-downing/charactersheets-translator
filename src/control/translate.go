@@ -112,7 +112,7 @@ type TaskProgress struct {
 func importMasterData(data []map[string]string, clean bool, progress *TaskProgress) {
 	sleepTime, _ := time.ParseDuration("5ms")
 	fmt.Println("Importing", len(data), "master records")
-	progress.Scale = len(data)
+	progress.Scale = len(data) + len(data) / 4
 	progress.Progress = 0
 
 	if clean {
@@ -163,6 +163,7 @@ func importMasterData(data []map[string]string, clean bool, progress *TaskProgre
 	fmt.Println("Import complete. Imported", progress.Progress, "master records")
 
 	model.MarkAllConflicts()
+	progress.Finished = true
 	fmt.Println("Conflicts marked")
 }
 
