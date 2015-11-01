@@ -6,3 +6,6 @@ run:
 
 log:
 	tailf /var/log/translator
+
+migrate:
+	go run src/migrate.go
