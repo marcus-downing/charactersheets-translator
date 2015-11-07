@@ -166,7 +166,7 @@ func GetEntriesAt(game string, level int, show, search, language string, transla
 		}
 	}
 
-	sql = sql + " group by Original, PartOf"
+	sql = sql + " group by Entries.EntryID"
 	if show == "translated" {
 		sql = sql + " having count(Translations.Translation) > 0"
 	} else if show == "untranslated" {

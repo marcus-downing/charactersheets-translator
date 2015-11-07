@@ -53,8 +53,11 @@ func EntriesHandler(w http.ResponseWriter, r *http.Request) {
 		data.CurrentSearch = r.FormValue("search")
 
 		data.Entries = model.GetStackedEntries(data.CurrentGame, data.CurrentLevel, data.CurrentShow, data.CurrentSearch, "uses", "gb", currentUser)
+		if model.Debug >= 2 { fmt.Println("Loaded", len(data.Entries), "entries") }
 		data.Page = Paginate(r, PageSize, len(data.Entries))
+		if model.Debug >= 2 { fmt.Println("Pagination", data.Page) }
 		data.Entries = data.Entries[data.Page.Offset:data.Page.Slice]
+		if model.Debug >= 2 { fmt.Println("Chopped down to", len(data.Entries), "entries") }
 		return data
 	})
 }
@@ -194,6 +197,7 @@ func importTranslationData(data []map[string]string, language string, translator
 	fmt.Println("Import complete:", progress.Progress, "of", len(data))
 	
 	model.MarkAllConflicts()
+	progress.Finished = true
 	fmt.Println("Conflicts marked")
 }
 
@@ -277,6 +281,20 @@ func ImportAbortHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/import", 303)
 }
 
+func recalculate(progress *TaskProgress) {
+	model.MarkAllConflicts()
+	progress.Finished = true
+}
+
+func RecalculateHandler(w http.ResponseWriter, r *http.Request) {
+	progress := new(TaskProgress)
+	progress.ID = <- nextProgressID
+	CurrentProgress[progress.ID] = progress
+
+	go recalculate(progress)
+	http.Redirect(w, r, "/import/progress?id="+strconv.Itoa(progress.ID), 303)
+}
+
 func ExportHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		language := r.FormValue("language")
@@ -303,7 +321,6 @@ func ExportHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		out.Flush()
-		return
 	} else {
 		renderTemplate("export", w, r, func(data TemplateData) TemplateData {
 			return data

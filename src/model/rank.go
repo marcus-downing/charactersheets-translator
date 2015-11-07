@@ -138,7 +138,7 @@ func (entry *StackedEntry) RankTranslations(translations []*StackedTranslation, 
 				voteWeight++;
 			}
 
-			scores[text] += voteWeight
+			scores[text] -= voteWeight
 		}
 	}
 
