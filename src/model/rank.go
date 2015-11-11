@@ -52,6 +52,10 @@ func SelectPreferredTranslation(entry *StackedEntry, language string, translatio
 	for _, st := range translations {
 		text := st.FullText
 		scores[text] = 0
+	}
+
+	for _, st := range translations {
+		text := st.FullText
 		votes := st.GetVotes()
 		for _, vote := range votes {
 			if vote.Vote {
