@@ -18,17 +18,11 @@ func (st *StackedTranslation) GetVotes() []*Vote {
 }
 
 func GetPreferredTranslations(language string) []*StackedTranslation {
-	lead := GetLanguageLead(language)
-	var leadEmail string = ""
-	if lead != nil {
-		leadEmail = lead.Email
-	}
-
 	entries := stackEntries(GetEntries())
 	pref := make([]*StackedTranslation, 0, len(entries))
 	for _, entry := range entries {
 		translations := entry.GetTranslations(language)
-		selected := SelectPreferredTranslation(entry, language, translations, leadEmail)
+		selected := PickPreferredTranslation(entry.RankTranslations(translations, false))
 		if selected != nil {
 			pref = append(pref, selected)
 		}
@@ -37,61 +31,22 @@ func GetPreferredTranslations(language string) []*StackedTranslation {
 	return pref
 }
 
-func SelectPreferredTranslation(entry *StackedEntry, language string, translations []*StackedTranslation, lead string) *StackedTranslation {
-	if len(translations) == 0 {
-		return nil
-	}
-	if len(translations) == 1 {
-		return translations[0]
-	}
-
-	//  count scores for the text of a translation, so duplicates are merged
-	//  votes are worth two; language lead is worth one (so it's a tie-breaker)
-	scores := make(map[string]int, len(translations))
-
-	for _, st := range translations {
-		text := st.FullText
-		scores[text] = 0
-	}
-
-	for _, st := range translations {
-		text := st.FullText
-		votes := st.GetVotes()
-		scores[text] += 2
-		for _, vote := range votes {
-			if vote.Vote {
-				scores[text] += 2
-			} else {
-				scores[text] -= 2
-			}
-		}
-		if st.Translator == lead {
-			scores[text]++
-		}
-	}
-
-	//  get translations from people who haven't voted
-
-	//  pick the highest score
-	highestText := ""
-	highestScore := 0
-	for text, score := range scores {
-		if score > highestScore {
-			highestScore = score
-			highestText = text
-		}
-	}
-	for _, st := range translations {
-		if st.FullText == highestText {
-			return st
-		}
-	}
-	return translations[0]
-}
-
 type RankTranslation struct {
 	Translation *StackedTranslation
 	Rank        int
+}
+
+func PickPreferredTranslation(translations []RankTranslation) *StackedTranslation {
+	if len(translations) == 0 {
+		return nil
+	}
+
+	for _, tr := range translations {
+		if tr.Translation.IsPreferred {
+			return tr.Translation
+		}
+	}
+	return translations[0].Translation
 }
 
 func (entry *StackedEntry) RankTranslations(translations []*StackedTranslation, save bool) []RankTranslation {
