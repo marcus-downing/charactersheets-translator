@@ -43,7 +43,7 @@
 			<div class='row'>
 			{{ range $lang := .Languages }}
 				<div class='col-sm-6'>
-					<p><a href='/export?language={{ $lang }}'><img src='/images/flags/{{ $lang }}.png'> &nbsp; {{ index $languageNames $lang }}</a></p>
+					<a class='btn btn-small' href='/export?language={{ $lang }}'><img src='/images/flags/{{ $lang }}.png'> &nbsp; {{ index $languageNames $lang }}</a>
 				</div>
 			{{ end }}
 			</div>
