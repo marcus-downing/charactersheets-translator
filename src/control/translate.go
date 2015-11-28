@@ -303,7 +303,7 @@ func ExportHandler(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Encoding", "UTF-8")
 		w.Header().Set("Content-Type", "application/csv; charset=UTF-8")
-		w.Header().Set("Content-Disposition", "attachment; filename=\""+model.LanguageNames[language]+".csv\"")
+		w.Header().Set("Content-Disposition", "attachment; filename=\""+model.LanguageNamesEnglish[language]+".csv\"")
 
 		out := csv.NewWriter(w)
 		out.Write([]string{

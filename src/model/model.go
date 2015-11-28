@@ -35,6 +35,22 @@ var LanguageNames map[string]string = map[string]string{
 	"us": "US English",
 }
 
+var LanguageNamesEnglish map[string]string = map[string]string{
+	"gb": "English",
+	"it": "Italian",
+	"fr": "French",
+	"de": "German",
+	"es": "Spanish",
+	"pl": "Polish",
+	"pt": "Portuguese",
+	"ru": "Russian",
+	"nl": "Dutch",
+	"no": "Norwegian",
+	"cy": "Welsh",
+	"kl": "Klingon",
+	"us": "US English",
+}
+
 var LanguagePaths map[string]string = map[string]string{
 	"it": "italian",
 	"fr": "french",
