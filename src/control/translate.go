@@ -296,8 +296,8 @@ func RecalculateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ExportHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
-		language := r.FormValue("language")
+	language := r.FormValue("language")
+	if language != "" {
 		fmt.Println("Exporting in", language)
 		translations := model.GetPreferredTranslations(language)
 
@@ -334,29 +334,35 @@ func LiveExportHandler(w http.ResponseWriter, r *http.Request) {
 		translations := model.GetLiveTranslations()
 
 		w.Header().Set("Content-Encoding", "UTF-8")
-		w.Header().Set("Content-Type", "application/csv; charset=UTF-8")
-		w.Header().Set("Content-Disposition", "attachment; filename=\"live.csv\"")
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.Header().Set("Content-Disposition", "attachment; filename=\"translations.json\"")
 
-		out := csv.NewWriter(w)
-		out.Write([]string{
-			"Original",
-			"Part of",
-			"Language",
-			"Translation",
-		})
-		for _, translation := range translations {
-			for _, part := range translation.Parts {
-				out.Write([]string{
-					part.Entry.Original,
-					part.Entry.PartOf,
-					translation.Language,
-					part.Translation,
-				})
-			}
-		}
-		out.Flush()
-		return
+		w.Write(translations)
 	}
+}
+
+func MasterInjectionExportHandler(w http.ResponseWriter, r *http.Request) {
+	// extraEntries := model.GetMasterInjectionEntries()
+
+	w.Header().Set("Content-Encoding", "UTF-8")
+	w.Header().Set("Content-Type", "application/csv; charset=UTF-8")
+	w.Header().Set("Content-Disposition", "attachment; filename=\"injection.csv\"")
+
+	out := csv.NewWriter(w)
+	out.Write([]string{
+		"Original",
+		"Part of",
+	})
+	// for _, entry := range extraEntries {
+	// 	for _, part := range entry.Parts {
+	// 		out.Write([]string{
+	// 			part.Original,
+	// 			part.PartOf,
+	// 		})
+	// 	}
+	// }
+	out.Flush()
+	return
 }
 
 func associateData(in [][]string) []map[string]string {
