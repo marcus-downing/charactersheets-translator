@@ -18,12 +18,11 @@ import (
 func DashboardHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Dashboard")
 
-	renderTemplate("home", w, r, func(data TemplateData) TemplateData {
+	renderTemplate("home", w, r, func(data *TemplateData) {
 		data.LanguageCompletion = model.GetLanguageCompletion()
 		data.Issues, data.NumIssues = GetGithubIssues()
 		data.WebsiteIssues, data.NumWebsiteIssues = GetWebsiteIssues()
 		data.TranslatorIssues, data.NumTranslatorIssues = GetTranslatorIssues()
-		return data
 	})
 }
 
@@ -43,13 +42,12 @@ func UsersHandler(w http.ResponseWriter, r *http.Request) {
 
 		http.Redirect(w, r, "/users", 303)
 	} else {
-		renderTemplate("users", w, r, func(data TemplateData) TemplateData {
+		renderTemplate("users", w, r, func(data *TemplateData) {
 			data.Users = model.GetUsers()
 			data.UsersByLanguage = make(map[string][]*model.User, len(data.Languages))
 			for _, user := range data.Users {
 				data.UsersByLanguage[user.Language] = append(data.UsersByLanguage[user.Language], user)
 			}
-			return data
 		})
 	}
 }
@@ -59,10 +57,7 @@ func UsersAddHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func UsersMasqueradeHandler(w http.ResponseWriter, r *http.Request) {
-	renderTemplate("users_masq", w, r, func(data TemplateData) TemplateData {
-		// data.User = user
-		return data
-	})
+	renderTemplate("users_masq", w, r, nil)
 }
 
 func UsersDelHandler(w http.ResponseWriter, r *http.Request) {
@@ -85,9 +80,8 @@ func UsersDelHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/users", 303)
 		return
 	} else {
-		renderTemplate("users_del", w, r, func(data TemplateData) TemplateData {
+		renderTemplate("users_del", w, r, func(data *TemplateData) {
 			data.User = user
-			return data
 		})
 	}
 }
@@ -105,9 +99,7 @@ func AccountHandler(w http.ResponseWriter, r *http.Request) {
 
 		http.Redirect(w, r, "/home", 303)
 	} else {
-		renderTemplate("account", w, r, func(data TemplateData) TemplateData {
-			return data
-		})
+		renderTemplate("account", w, r, nil)
 	}
 }
 
@@ -127,9 +119,7 @@ func SetPasswordHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		http.Redirect(w, r, "/account", 303)
 	} else {
-		renderTemplate("account_set_password", w, r, func(data TemplateData) TemplateData {
-			return data
-		})
+		renderTemplate("account_set_password", w, r, nil)
 	}
 }
 

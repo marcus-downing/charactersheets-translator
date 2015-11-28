@@ -25,7 +25,7 @@ const (
 )
 
 func SourcesHandler(w http.ResponseWriter, r *http.Request) {
-	renderTemplate("sources", w, r, func(data TemplateData) TemplateData {
+	renderTemplate("sources", w, r, func(data *TemplateData) {
 		data.CurrentGame = r.FormValue("game")
 		data.CurrentLevel = r.FormValue("level")
 		data.CurrentShow = r.FormValue("show")
@@ -40,13 +40,12 @@ func SourcesHandler(w http.ResponseWriter, r *http.Request) {
 
 		data.Page = Paginate(r, PageSize, len(data.Sources))
 		data.Sources = data.Sources[data.Page.Offset:data.Page.Slice]
-		return data
 	})
 }
 
 func EntriesHandler(w http.ResponseWriter, r *http.Request) {
 	currentUser := GetCurrentUser(r)
-	renderTemplate("entries", w, r, func(data TemplateData) TemplateData {
+	renderTemplate("entries", w, r, func(data *TemplateData) {
 		data.CurrentGame = r.FormValue("game")
 		data.CurrentLevel = r.FormValue("level")
 		data.CurrentShow = r.FormValue("show")
@@ -58,13 +57,12 @@ func EntriesHandler(w http.ResponseWriter, r *http.Request) {
 		if model.Debug >= 2 { fmt.Println("Pagination", data.Page) }
 		data.Entries = data.Entries[data.Page.Offset:data.Page.Slice]
 		if model.Debug >= 2 { fmt.Println("Chopped down to", len(data.Entries), "entries") }
-		return data
 	})
 }
 
 func TranslationHandler(w http.ResponseWriter, r *http.Request) {
 	currentUser := GetCurrentUser(r)
-	renderTemplate("translate", w, r, func(data TemplateData) TemplateData {
+	renderTemplate("translate", w, r, func(data *TemplateData) {
 		rlang := r.FormValue("language")
 		if rlang != "" {
 			data.CurrentLanguage = rlang
@@ -85,7 +83,6 @@ func TranslationHandler(w http.ResponseWriter, r *http.Request) {
 
 		data.Page = Paginate(r, PageSize, len(data.Entries))
 		data.Entries = data.Entries[data.Page.Offset:data.Page.Slice]
-		return data
 	})
 }
 
@@ -249,9 +246,8 @@ func ImportHandler(w http.ResponseWriter, r *http.Request) {
 
 		http.Redirect(w, r, "/import/progress?id="+strconv.Itoa(progress.ID), 303)
 	} else {
-		renderTemplate("import", w, r, func(data TemplateData) TemplateData {
+		renderTemplate("import", w, r, func(data *TemplateData) {
 			data.Users = model.GetUsers()
-			return data
 		})
 	}
 }
@@ -263,13 +259,12 @@ func ImportProgressHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/import", 303)
 	}
 	
-	renderTemplate("import_progress", w, r, func(data TemplateData) TemplateData {
+	renderTemplate("import_progress", w, r, func(data *TemplateData) {
 		if ok {
 			percent := float64(progress.Progress) * 100 / float64(progress.Scale)
 			data.ProgressPercent = int(math.Floor(percent))
 			data.ProgressID = progress.ID
 		}
-		return data
 	})
 }
 
@@ -322,9 +317,7 @@ func ExportHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		out.Flush()
 	} else {
-		renderTemplate("export", w, r, func(data TemplateData) TemplateData {
-			return data
-		})
+		renderTemplate("export", w, r, nil)
 	}
 }
 

@@ -459,6 +459,14 @@ func isConflicted(language string, entry *model.StackedEntry) bool {
 	return isConflicted
 }
 
+func getUserName(email string) string {
+	user := model.GetUserByEmail(email)
+	if user == nil {
+		return ""
+	}
+	return user.Name
+}
+
 var templateFuncs = template.FuncMap{
 	"percentColour":          percentColour,
 	"md5":                    md5sum,
@@ -479,14 +487,15 @@ var templateFuncs = template.FuncMap{
 	"isVotedUp":              isVotedUp,
 	"isVotedDown":            isVotedDown,
 	"isConflicted":           isConflicted,
+	"getUserName":            getUserName,
 }
 
 // var partials = template.ParseGlob("view/inc/*"))
 
-func renderTemplate(name string, w http.ResponseWriter, r *http.Request, dataproc func(data TemplateData) TemplateData) {
+func renderTemplate(name string, w http.ResponseWriter, r *http.Request, dataproc func(data *TemplateData)) {
 	var data = GetTemplateData(r, name)
 	if dataproc != nil {
-		data = dataproc(data)
+		dataproc(&data)
 	}
 	fmt.Println("Rendering page:", name)
 
